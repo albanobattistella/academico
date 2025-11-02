@@ -2,12 +2,15 @@
 
 {{--<li class='nav-item'><a class='nav-link' href="{{ url('/') }}"><i class="nav-icon la la-book"></i> <span>{{ __('Home') }}</span></a></li>--}}
 
-@if(backpack_user()->hasRole(['admin', 'secretary']))
+@if(backpack_user()->hasRole(['admin', 'secretary', 'viewer']))
     <li class="nav-title">@lang('COURSES')</li>
         <li class='nav-item'><a class='nav-link' href="{{ route('course-view-find') }}"><i class="nav-icon la la-book"></i> <span>@lang('Internal Courses')</span></a></li>
         @if (config('settings.external_courses_enabled'))
             <li class='nav-item'><a class='nav-link' href="{{ backpack_url('externalcourse') }}"><i class="nav-icon la la-bus"></i> <span>@lang('External Courses')</span></a></li>
         @endif
+@endif
+
+@if(backpack_user()->hasRole(['admin', 'secretary']))
     <li class="nav-title">@lang('Administration')</li>
         <li class='nav-item'><a class='nav-link' href="{{ backpack_url('student') }}"><i class="nav-icon la la-user"></i> <span>@lang('Students')</span></a></li>
         <li class='nav-item'><a class='nav-link' href="{{ backpack_url('enrollment') }}"><i class="nav-icon la la-credit-card"></i> <span>@lang('Enrollments')</span></a></li>
