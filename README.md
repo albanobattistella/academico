@@ -7,6 +7,65 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Docker Setup
+
+This application runs in Docker using FrankenPHP, a modern application server for PHP built on Caddy.
+
+### Prerequisites
+- Docker Desktop installed
+- Docker Compose installed
+
+### Quick Start
+
+1. Copy the environment file:
+```bash
+cp .env.example .env
+```
+
+2. Start the Docker containers:
+```bash
+docker-compose up -d
+```
+
+3. Install dependencies (if not using the built image):
+```bash
+docker-compose exec app composer install
+docker-compose exec app npm install && npm run build
+```
+
+4. Generate application key:
+```bash
+docker-compose exec app php artisan key:generate
+```
+
+5. Run migrations:
+```bash
+docker-compose exec app php artisan migrate
+```
+
+6. Access the application at `http://localhost:8080`
+
+### Services
+
+- **app**: Laravel application with FrankenPHP (PHP 8.5) - ports 8080 (HTTP) and 8443 (HTTPS)
+- **db**: MariaDB 11 database (port 3306)
+
+### Useful Commands
+
+```bash
+# Stop containers
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Run artisan commands
+docker-compose exec app php artisan [command]
+
+# Access the database
+docker-compose exec db mysql -u academico_user -p academico_filament
+```
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
