@@ -16,36 +16,15 @@ services:
       - ./docker/Caddyfile:/etc/caddy/Caddyfile
     networks:
       - academico-network
-    depends_on:
-      - db
+      - sail
     environment:
       - SERVER_NAME=:80
-      - DB_HOST=db
+      - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_DATABASE=academico_filament
-      - DB_USERNAME=academico_user
-      - DB_PASSWORD=secret
-
-  db:
-    image: mariadb:11
-    container_name: academico-filament-db
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: academico_filament
-      MYSQL_USER: academico_user
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: rootsecret
-    ports:
-      - "3306:3306"
-    volumes:
-      - dbdata:/var/lib/mysql
-    networks:
-      - academico-network
 
 networks:
   academico-network:
     driver: bridge
-
-volumes:
-  dbdata:
-    driver: local
+  sail:
+    external: true
+    name: academico_sail
