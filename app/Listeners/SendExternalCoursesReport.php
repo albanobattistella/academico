@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\ExternalCoursesReportEvent;
 use App\Mail\ExternalCourseReport;
 use App\Models\Partner;
 use Carbon\Carbon;
@@ -10,17 +11,7 @@ use Illuminate\Support\Facades\Mail;
 
 class SendExternalCoursesReport
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    public function handle(): void
+    public function handle(ExternalCoursesReportEvent $event): void
     {
         $period_start = Carbon::parse('first day of this month');
         $period_end = Carbon::parse('last day of this month');

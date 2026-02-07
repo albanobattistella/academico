@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Events\CourseCreated;
 use App\Events\CourseUpdated;
 use App\Traits\PriceTrait;
 use Carbon\Carbon;
@@ -25,7 +24,6 @@ class Course extends Model
 
     protected $dispatchesEvents = [
         'updated' => CourseUpdated::class,
-        'created' => CourseCreated::class,
     ];
 
     protected $casts = [

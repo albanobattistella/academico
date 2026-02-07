@@ -469,8 +469,6 @@
     "The course you are editing is the parent of these sub-courses:": "The course you are editing is the parent of these sub-courses:",
     "Editable fields for the parent course are limited. Please update children courses accordingly": "Editable fields for the parent course are limited. Please update children courses accordingly",
     "If you assign a schedule preset, the coursetimes above will be ignored.": "If you assign a schedule preset, the coursetimes above will be ignored.",
-    "Sync to LMS" : "Sync with LMS",
-    "LMS code": "LMS code",
     "Warning": "Warning",
     "Do you really want to delete this phone number?": "Do you really want to delete this phone number?",
     "Do you really want to delete this contact?": "Do you really want to delete this contact?",

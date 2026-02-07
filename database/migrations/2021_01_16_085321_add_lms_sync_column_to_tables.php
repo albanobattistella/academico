@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        // todo - later, when migration to filament is complete - create a migration to remove these columns
     }
 };

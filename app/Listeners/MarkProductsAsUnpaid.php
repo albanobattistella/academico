@@ -2,13 +2,14 @@
 
 namespace App\Listeners;
 
+use App\Events\InvoiceDeleting;
 use App\Models\Invoice;
 
 use function Sentry\captureMessage;
 
 class MarkProductsAsUnpaid
 {
-    public function handle($event): void
+    public function handle(InvoiceDeleting $event): void
     {
         /** @var Invoice $invoice */
         $invoice = $event->invoice;

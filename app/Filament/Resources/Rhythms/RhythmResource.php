@@ -45,8 +45,6 @@ class RhythmResource extends Resource
                     ->required()
                     ->numeric(),
                 TextInput::make('product_code'),
-                TextInput::make('lms_id')
-                    ->label('LMS Code'),
             ]);
     }
 
@@ -60,8 +58,6 @@ class RhythmResource extends Resource
                 TextColumn::make('default_volume')
                     ->sortable(),
                 TextColumn::make('product_code'),
-                TextColumn::make('lms_id')
-                    ->label('LMS Code'),
             ])
             ->filters([
                 TrashedFilter::make(),

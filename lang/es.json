@@ -469,8 +469,6 @@
     "The course you are editing is the parent of these sub-courses:": "Este curso tiene los sub-modulos siguientes:",
     "Editable fields for the parent course are limited. Please update children courses accordingly": "Algunos datos no pueden ser modificadas. Por favor, realice los otros cambios directamente en los sub-modulos",
     "If you assign a schedule preset, the coursetimes above will be ignored.": "Si selecciona un modelo, los horarios manuales no seran guardados.",
-    "Sync to LMS": "Sincronisar con plataforma LMS",
-    "LMS code": "Codigo LMS",
     "Warning": "Atencion",
     "Do you really want to delete this phone number?": "Confirma que quiere quitar este numero de telefono?",
     "Do you really want to delete this contact?": "Confirma que quiere quitar este contacto?",
