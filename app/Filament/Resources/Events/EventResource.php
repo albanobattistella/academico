@@ -1,0 +1,141 @@
+<?php
+
+namespace App\Filament\Resources\Events;
+
+use App\Filament\Resources\Events\Pages\ListEvents;
+use App\Models\Event;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
+
+class EventResource extends Resource
+{
+    protected static ?string $model = Event::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendar;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Academic';
+
+    protected static ?int $navigationSort = 3;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('name')
+                    ->required()
+                    ->minLength(1)
+                    ->maxLength(255),
+                Select::make('course_id')
+                    ->relationship('course', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->nullable(),
+                Select::make('teacher_id')
+                    ->relationship('teacher', 'id')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
+                    ->preload()
+                    ->searchable()
+                    ->nullable(),
+                Select::make('room_id')
+                    ->relationship('room', 'name')
+                    ->preload()
+                    ->nullable(),
+                DateTimePicker::make('start')
+                    ->required(),
+                DateTimePicker::make('end')
+                    ->required(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('course.name')
+                    ->label('Course')
+                    ->sortable(),
+                TextColumn::make('volume')
+                    ->label('Hours')
+                    ->formatStateUsing(fn ($state): string => number_format($state, 1).'h')
+                    ->sortable(),
+                TextColumn::make('teacher.name')
+                    ->label('Teacher')
+                    ->sortable(),
+                TextColumn::make('room.name')
+                    ->label('Room')
+                    ->sortable(),
+                TextColumn::make('start')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('end')
+                    ->dateTime()
+                    ->sortable(),
+            ])
+            ->defaultSort('start', 'desc')
+            ->filters([
+                Filter::make('date_range')
+                    ->form([
+                        \Filament\Forms\Components\DatePicker::make('from'),
+                        \Filament\Forms\Components\DatePicker::make('until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['from'], fn (Builder $q, $date) => $q->where('start', '>=', $date))
+                            ->when($data['until'], fn (Builder $q, $date) => $q->where('start', '<=', $date.' 23:59:59'));
+                    }),
+                TernaryFilter::make('orphan')
+                    ->label('No course')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNull('course_id'),
+                        false: fn (Builder $query) => $query->whereNotNull('course_id'),
+                    ),
+                TernaryFilter::make('unassigned')
+                    ->label('No teacher')
+                    ->queries(
+                        true: fn (Builder $query) => $query->unassigned(),
+                        false: fn (Builder $query) => $query->whereNotNull('teacher_id'),
+                    ),
+                SelectFilter::make('teacher_id')
+                    ->relationship('teacher', 'id')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
+                    ->label('Teacher')
+                    ->searchable()
+                    ->preload(),
+            ])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListEvents::route('/'),
+        ];
+    }
+}

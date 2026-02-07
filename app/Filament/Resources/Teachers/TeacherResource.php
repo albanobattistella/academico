@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Filament\Resources\Teachers;
+
+use App\Filament\Resources\Teachers\Pages\CreateTeacher;
+use App\Filament\Resources\Teachers\Pages\EditTeacher;
+use App\Filament\Resources\Teachers\Pages\ListTeachers;
+use App\Models\Teacher;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
+
+class TeacherResource extends Resource
+{
+    protected static ?string $model = Teacher::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
+
+    protected static string|UnitEnum|null $navigationGroup = 'People';
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('firstname')
+                    ->label('First name')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('lastname')
+                    ->label('Last name')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('email')
+                    ->email()
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('max_week_hours')
+                    ->label('Max weekly hours')
+                    ->numeric()
+                    ->step(0.01)
+                    ->nullable(),
+                DatePicker::make('hired_at')
+                    ->nullable(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('user.lastname')
+                    ->label('Last name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('user.firstname')
+                    ->label('First name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('user.email')
+                    ->label('Email')
+                    ->searchable(),
+                TextColumn::make('max_week_hours')
+                    ->label('Max hours/week')
+                    ->numeric(decimalPlaces: 2)
+                    ->sortable(),
+                TextColumn::make('hired_at')
+                    ->date()
+                    ->sortable(),
+            ])
+            ->filters([
+                TrashedFilter::make(),
+            ])
+            ->recordActions([
+                EditAction::make(),
+                RestoreAction::make(),
+                ForceDeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListTeachers::route('/'),
+            'create' => CreateTeacher::route('/create'),
+            'edit' => EditTeacher::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRecordRouteBindingEloquentQuery(): Builder
+    {
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+}

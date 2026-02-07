@@ -1,0 +1,201 @@
+<?php
+
+namespace App\Filament\Resources\Students;
+
+use App\Filament\Resources\Students\Pages\CreateStudent;
+use App\Filament\Resources\Students\Pages\EditStudent;
+use App\Filament\Resources\Students\Pages\ListStudents;
+use App\Filament\Resources\Students\RelationManagers\ContactsRelationManager;
+use App\Filament\Resources\Students\RelationManagers\EnrollmentsRelationManager;
+use App\Models\Student;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use UnitEnum;
+
+class StudentResource extends Resource
+{
+    protected static ?string $model = Student::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+
+    protected static string|UnitEnum|null $navigationGroup = 'People';
+
+    protected static ?int $navigationSort = 1;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Tabs::make('Student')
+                    ->columnSpanFull()
+                    ->tabs([
+                        Tab::make('Student Info')
+                            ->schema([
+                                TextInput::make('firstname')
+                                    ->label('First name')
+                                    ->required()
+                                    ->maxLength(30),
+                                TextInput::make('lastname')
+                                    ->label('Last name')
+                                    ->required()
+                                    ->maxLength(30),
+                                TextInput::make('email')
+                                    ->email()
+                                    ->nullable()
+                                    ->maxLength(60),
+                                TextInput::make('idnumber')
+                                    ->label('ID Number')
+                                    ->nullable(),
+                                DatePicker::make('birthdate')
+                                    ->nullable(),
+                                Radio::make('gender_id')
+                                    ->label('Gender')
+                                    ->options([
+                                        0 => __('Other'),
+                                        1 => __('Female'),
+                                        2 => __('Male'),
+                                    ])
+                                    ->required()
+                                    ->default(0)
+                                    ->inline(),
+                                FileUpload::make('profile_picture')
+                                    ->image()
+                                    ->directory('student-photos')
+                                    ->nullable(),
+                                Select::make('profession_id')
+                                    ->relationship('profession', 'name')
+                                    ->preload()
+                                    ->searchable()
+                                    ->createOptionForm([
+                                        TextInput::make('name')->required(),
+                                    ])
+                                    ->nullable(),
+                                Select::make('institution_id')
+                                    ->relationship('institution', 'name')
+                                    ->preload()
+                                    ->searchable()
+                                    ->createOptionForm([
+                                        TextInput::make('name')->required(),
+                                    ])
+                                    ->nullable(),
+                                Repeater::make('phone')
+                                    ->relationship()
+                                    ->label('Phone numbers')
+                                    ->schema([
+                                        TextInput::make('phone_number')
+                                            ->label('Phone number')
+                                            ->required(),
+                                    ])
+                                    ->defaultItems(0)
+                                    ->reorderable(false),
+                            ]),
+
+                        Tab::make('Address')
+                            ->schema([
+                                TextInput::make('address')
+                                    ->nullable()
+                                    ->maxLength(60),
+                                TextInput::make('zip_code')
+                                    ->nullable()
+                                    ->maxLength(10),
+                                TextInput::make('city')
+                                    ->nullable()
+                                    ->maxLength(30),
+                                TextInput::make('state')
+                                    ->nullable()
+                                    ->maxLength(30),
+                                TextInput::make('country')
+                                    ->nullable()
+                                    ->maxLength(20),
+                            ]),
+
+                        Tab::make('Invoicing Info')
+                            ->schema([
+                                TextInput::make('iban')
+                                    ->label('IBAN')
+                                    ->nullable()
+                                    ->maxLength(90),
+                                TextInput::make('bic')
+                                    ->label('BIC')
+                                    ->nullable()
+                                    ->maxLength(30),
+                            ]),
+                    ]),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('idnumber')
+                    ->label('ID')
+                    ->searchable(),
+                TextColumn::make('user.lastname')
+                    ->label('Last name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('user.firstname')
+                    ->label('First name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('user.email')
+                    ->label('Email')
+                    ->searchable(),
+                TextColumn::make('student_age')
+                    ->label('Age'),
+                TextColumn::make('phone.phone_number')
+                    ->label('Phone')
+                    ->badge(),
+            ])
+            ->filters([
+                SelectFilter::make('institution_id')
+                    ->relationship('institution', 'name')
+                    ->label('Institution')
+                    ->preload()
+                    ->searchable(),
+            ])
+            ->defaultSort('id', 'desc')
+            ->recordActions([
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ContactsRelationManager::class,
+            EnrollmentsRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListStudents::route('/'),
+            'create' => CreateStudent::route('/create'),
+            'edit' => EditStudent::route('/{record}/edit'),
+        ];
+    }
+}
