@@ -6,21 +6,27 @@ use App\Models\Period;
 use BackedEnum;
 use Filament\Pages\Page;
 
-class LevelsReport extends Page
+class LevelsAndRhythmsReport extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 5;
 
-    protected string $view = 'filament.pages.levels-report';
+    protected string $view = 'filament.pages.levels-and-rhythms-report';
 
     public ?int $selectedPeriodId = null;
 
     /** @var array<int, array<string, mixed>> */
-    public array $reportData = [];
+    public array $levelsData = [];
 
     /** @var array<string, mixed> */
-    public array $chartData = [];
+    public array $levelsChartData = [];
+
+    /** @var array<int, array<string, mixed>> */
+    public array $rhythmsData = [];
+
+    /** @var array<string, mixed> */
+    public array $rhythmsChartData = [];
 
     public function mount(): void
     {
@@ -45,6 +51,12 @@ class LevelsReport extends Page
             return;
         }
 
+        $this->loadLevelsData($period);
+        $this->loadRhythmsData($period);
+    }
+
+    protected function loadLevelsData(Period $period): void
+    {
         $courseGroups = $period->courses()
             ->where('parent_course_id', null)
             ->with('level')
@@ -79,8 +91,48 @@ class LevelsReport extends Page
             $values[] = $enrollmentCount;
         }
 
-        $this->reportData = $data;
-        $this->chartData = [
+        $this->levelsData = $data;
+        $this->levelsChartData = [
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'data' => $values,
+                    'backgroundColor' => array_slice($colors, 0, count($values)),
+                ],
+            ],
+        ];
+    }
+
+    protected function loadRhythmsData(Period $period): void
+    {
+        $courseGroups = $period->courses()
+            ->where('parent_course_id', null)
+            ->with('rhythm')
+            ->withCount('enrollments')
+            ->get()
+            ->where('enrollments_count', '>', 0)
+            ->groupBy('rhythm_id');
+
+        $data = [];
+        $labels = [];
+        $values = [];
+        $colors = ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'];
+
+        foreach ($courseGroups as $rhythmId => $courses) {
+            $rhythmName = $courses->first()->rhythm->name ?? __('Other');
+            $enrollmentCount = $courses->sum('enrollments_count');
+
+            $data[] = [
+                'rhythm' => $rhythmName,
+                'enrollments' => $enrollmentCount,
+            ];
+
+            $labels[] = $rhythmName;
+            $values[] = $enrollmentCount;
+        }
+
+        $this->rhythmsData = $data;
+        $this->rhythmsChartData = [
             'labels' => $labels,
             'datasets' => [
                 [
@@ -98,11 +150,11 @@ class LevelsReport extends Page
 
     public static function getNavigationLabel(): string
     {
-        return __('Levels Report');
+        return __('Levels & Rhythms Report');
     }
 
     public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
     {
-        return __('Levels Report');
+        return __('Levels & Rhythms Report');
     }
 }
