@@ -6,7 +6,6 @@ use App\Models\Course;
 use App\Models\CourseTime;
 use App\Models\Enrollment;
 use App\Models\Student;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

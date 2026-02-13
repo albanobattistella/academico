@@ -12,7 +12,7 @@ class ExternalSummaryReport extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 832;
 
     protected string $view = 'filament.pages.external-summary-report';
 

@@ -25,11 +25,11 @@ class PartnerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 150;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Academic');
+        return __('Course');
     }
 
     public static function getModelLabel(): string

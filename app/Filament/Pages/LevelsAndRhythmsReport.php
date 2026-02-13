@@ -10,7 +10,7 @@ class LevelsAndRhythmsReport extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 807;
 
     protected string $view = 'filament.pages.levels-and-rhythms-report';
 

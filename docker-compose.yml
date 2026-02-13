@@ -14,6 +14,7 @@ services:
       - ./storage:/app/storage
       - ./bootstrap/cache:/app/bootstrap/cache
       - ./docker/Caddyfile:/etc/caddy/Caddyfile
+      - ../academico-recipes/login.blade.php:/app/resources/views/filament/auth/login.blade.php
     networks:
       - academico-network
       - sail

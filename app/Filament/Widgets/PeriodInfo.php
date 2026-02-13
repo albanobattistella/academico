@@ -12,7 +12,7 @@ class PeriodInfo extends Widget
 
     protected string $view = 'filament.widgets.period-info';
 
-    protected int|string|array $columnSpan = 1;
+    protected int|string|array $columnSpan = 'full';
 
     public function getData(): array
     {

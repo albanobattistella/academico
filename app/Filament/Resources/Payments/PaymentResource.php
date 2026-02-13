@@ -21,11 +21,11 @@ class PaymentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 382;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Finance');
+        return __('Accounting');
     }
 
     public static function getModelLabel(): string

@@ -33,7 +33,7 @@ class ResultResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Academic');
+        return 'A revoir / WIP';
     }
 
     public static function getModelLabel(): string

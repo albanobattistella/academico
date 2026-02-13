@@ -6,7 +6,7 @@ use App\Interfaces\CertificatesInterface;
 use App\Interfaces\EnrollmentSheetInterface;
 use App\Interfaces\InvoicingInterface;
 use App\Interfaces\MailingSystemInterface;
-    use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider

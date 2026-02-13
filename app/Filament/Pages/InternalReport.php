@@ -13,7 +13,7 @@ class InternalReport extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 805;
 
     protected string $view = 'filament.pages.internal-report';
 

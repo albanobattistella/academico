@@ -6,6 +6,7 @@ use BackedEnum;
 use Filament\Clusters\Cluster;
 use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Contracts\Support\Htmlable;
 
 class SettingsCluster extends Cluster
 {
@@ -13,9 +14,12 @@ class SettingsCluster extends Cluster
 
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    protected static ?int $navigationSort = 99;
-
     protected string $view = 'filament.clusters.settings';
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('Settings');
+    }
 
     public static function getNavigationLabel(): string
     {

@@ -12,7 +12,7 @@ class AttendanceForCourseReport extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 816;
 
     protected string $view = 'filament.pages.attendance-for-course-report';
 

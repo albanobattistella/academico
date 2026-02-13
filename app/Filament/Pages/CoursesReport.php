@@ -11,7 +11,7 @@ class CoursesReport extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 810;
 
     protected string $view = 'filament.pages.courses-report';
 
@@ -47,7 +47,7 @@ class CoursesReport extends Page
             ->orderByDesc('real_enrollments_count')
             ->get();
 
-        $this->coursesData = $courses->map(fn ($course) => [
+        $this->coursesData = $courses->map(fn (Course $course) => [
             'name' => $course->name,
             'enrollments' => $course->real_enrollments_count,
             'rhythmName' => $course->rhythm?->name ?? '-',

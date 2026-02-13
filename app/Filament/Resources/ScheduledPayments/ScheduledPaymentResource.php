@@ -25,11 +25,11 @@ class ScheduledPaymentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 384;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Finance');
+        return __('Accounting');
     }
 
     public static function getModelLabel(): string

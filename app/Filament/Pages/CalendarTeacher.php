@@ -12,7 +12,7 @@ class CalendarTeacher extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 410;
 
     protected string $view = 'filament.pages.calendar-teacher';
 

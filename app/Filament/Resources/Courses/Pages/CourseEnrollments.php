@@ -29,7 +29,7 @@ class CourseEnrollments extends Page implements HasTable
     #[Url]
     public string $viewMode = 'list';
 
-    public function mount(int | string $record): void
+    public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
     }
@@ -102,7 +102,7 @@ class CourseEnrollments extends Page implements HasTable
 
     public function getTitle(): string
     {
-        return __('Enrollments') . ' — ' . $this->getRecord()->name;
+        return __('Enrollments').' — '.$this->getRecord()->name;
     }
 
     public function getRosterEnrollments(): \Illuminate\Support\Collection

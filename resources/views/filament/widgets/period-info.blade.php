@@ -3,6 +3,9 @@
         <x-slot name="heading">
             <div class="flex items-center justify-between">
                 <span>{{ __('Period Information') }}</span>
+                <x-filament::button size="sm" color="gray" icon="heroicon-m-pencil-square" :href="$this->getPeriodsUrl()" tag="a">
+                    {{ __('Change') }}
+                </x-filament::button>
             </div>
         </x-slot>
 
@@ -10,30 +13,16 @@
             $data = $this->getData();
         @endphp
 
-        <div class="space-y-4">
-            @if($data['currentPeriod'])
-                <div class="flex w-full">
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Current Period') }} : </span>
-                        <span class="text-lg font-semibold">{{ $data['currentPeriod']->name }}</span>
-                    </div>
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Current Period') }}</p>
+                <p class="text-lg font-semibold">{{ $data['currentPeriod']?->name ?? '—' }}</p>
+            </div>
 
-                    <div>
-                        <x-filament::button size="sm" color="gray" icon="heroicon-m-pencil-square" :href="$this->getPeriodsUrl()" tag="a">
-                            {{ __('Change') }}
-                        </x-filament::button>
-                    </div>
-                </div>
-
-
-            @endif
-
-            @if($data['enrollmentsPeriod'])
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Enrollments Period') }}</p>
-                    <p class="text-lg font-semibold">{{ $data['enrollmentsPeriod']->name }}</p>
-                </div>
-            @endif
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Enrollments Period') }}</p>
+                <p class="text-lg font-semibold">{{ $data['enrollmentsPeriod']?->name ?? '—' }}</p>
+            </div>
         </div>
     </x-filament::section>
 </x-filament-widgets::widget>

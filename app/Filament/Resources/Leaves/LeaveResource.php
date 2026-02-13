@@ -28,6 +28,8 @@ class LeaveResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
+    protected static ?int $navigationSort = 530;
+
     public static function getNavigationGroup(): ?string
     {
         return __('HR');

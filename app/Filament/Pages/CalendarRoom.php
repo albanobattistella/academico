@@ -12,7 +12,7 @@ class CalendarRoom extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 420;
 
     protected string $view = 'filament.pages.calendar-room';
 

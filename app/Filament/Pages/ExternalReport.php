@@ -14,7 +14,7 @@ class ExternalReport extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 830;
 
     protected string $view = 'filament.pages.external-report';
 

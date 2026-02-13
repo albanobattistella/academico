@@ -27,13 +27,13 @@ class ExternalCourseResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
-    protected static ?int $navigationSort = 9;
-
     protected static ?string $slug = 'external-courses';
+
+    protected static ?int $navigationSort = 110;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Academic');
+        return __('Courses');
     }
 
     public static function getModelLabel(): string

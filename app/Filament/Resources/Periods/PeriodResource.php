@@ -3,19 +3,19 @@
 namespace App\Filament\Resources\Periods;
 
 use App\Filament\Resources\Periods\Pages\ListPeriods;
+use App\Models\Config;
 use App\Models\Period;
 use BackedEnum;
-use App\Models\Config;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -112,10 +112,24 @@ class PeriodResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->action(function (Period $record) {
-                        Config::where('name', 'current_period')->update(['value' => $record->id]);
+                        Config::updateOrCreate(['name' => 'current_period'], ['value' => $record->id]);
 
                         Notification::make()
                             ->title(__('Current period updated'))
+                            ->body($record->name)
+                            ->success()
+                            ->send();
+                    }),
+                Action::make('setAsEnrollmentPeriod')
+                    ->label(__('Set as enrollment period'))
+                    ->icon('heroicon-m-academic-cap')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->action(function (Period $record) {
+                        Config::updateOrCreate(['name' => 'default_enrollment_period'], ['value' => $record->id]);
+
+                        Notification::make()
+                            ->title(__('Enrollment period updated'))
                             ->body($record->name)
                             ->success()
                             ->send();

@@ -40,7 +40,7 @@ class CheckoutPage extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Finance');
+        return 'A revoir / WIP';
     }
 
     public static function getNavigationLabel(): string

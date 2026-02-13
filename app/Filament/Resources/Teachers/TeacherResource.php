@@ -31,9 +31,11 @@ class TeacherResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
+    protected static ?int $navigationSort = 510;
+
     public static function getNavigationGroup(): ?string
     {
-        return __('People');
+        return __('HR');
     }
 
     public static function getModelLabel(): string

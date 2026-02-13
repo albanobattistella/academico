@@ -28,11 +28,11 @@ class EventResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendar;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 430;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Academic');
+        return __('Calendar');
     }
 
     public static function getModelLabel(): string

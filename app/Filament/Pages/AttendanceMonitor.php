@@ -14,7 +14,7 @@ class AttendanceMonitor extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 220;
 
     protected string $view = 'filament.pages.attendance-monitor';
 
@@ -104,7 +104,7 @@ class AttendanceMonitor extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Attendance');
+        return __('Administration');
     }
 
     public static function getNavigationLabel(): string

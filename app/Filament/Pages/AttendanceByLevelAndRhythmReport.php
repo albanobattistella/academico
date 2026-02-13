@@ -14,7 +14,7 @@ class AttendanceByLevelAndRhythmReport extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-bars-3';
 
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 814;
 
     protected string $view = 'filament.pages.attendance-by-level-and-rhythm-report';
 

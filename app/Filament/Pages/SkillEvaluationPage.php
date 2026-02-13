@@ -173,7 +173,7 @@ class SkillEvaluationPage extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Evaluations');
+        return 'A revoir / WIP';
     }
 
     public static function getNavigationLabel(): string

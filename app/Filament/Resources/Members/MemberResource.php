@@ -24,7 +24,7 @@ class MemberResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('People');
+        return 'A revoir / WIP';
     }
 
     public static function getModelLabel(): string

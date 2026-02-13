@@ -39,11 +39,11 @@ class CourseResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 100;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Academic');
+        return __('Courses');
     }
 
     public static function getModelLabel(): string
@@ -211,41 +211,33 @@ class CourseResource extends Resource
                 TextColumn::make('volume')
                     ->suffix('h')
                     ->sortable()
-                    ->toggleable()
-                ,
+                    ->toggleable(),
                 TextColumn::make('teacher.name')
                     ->label(__('Teacher'))
                     ->sortable()
-                    ->toggleable()
-                ,
+                    ->toggleable(),
                 TextColumn::make('room.name')
                     ->sortable()
-                    ->toggleable()
-                ,
+                    ->toggleable(),
                 TextColumn::make('course_times')
                     ->label(__('Schedule'))
-                    ->toggleable()
-                ,
+                    ->toggleable(),
                 TextColumn::make('course_enrollments_count')
                     ->label(__('Enrollments'))
                     ->sortable()
-                    ->toggleable()
-                ,
+                    ->toggleable(),
                 TextColumn::make('start_date')
                     ->date()
                     ->sortable()
-                    ->toggleable()
-                ,
+                    ->toggleable(),
                 TextColumn::make('end_date')
                     ->date()
                     ->sortable()
-                    ->toggleable()
-                ,
+                    ->toggleable(),
                 IconColumn::make('marked')
                     ->boolean()
                     ->label(__('Eval'))
-                    ->toggleable()
-                ,
+                    ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('period_id')

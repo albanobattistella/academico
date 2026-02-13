@@ -11,7 +11,7 @@ class HrDashboard extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 520;
 
     protected string $view = 'filament.pages.hr-dashboard';
 
