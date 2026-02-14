@@ -27,6 +27,11 @@ class PartnerResource extends Resource
 
     protected static ?int $navigationSort = 150;
 
+    public static function canAccess(): bool
+    {
+        return (bool) config('settings.external_courses_enabled');
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return __('Course');

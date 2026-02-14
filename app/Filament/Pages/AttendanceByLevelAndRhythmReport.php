@@ -16,6 +16,11 @@ class AttendanceByLevelAndRhythmReport extends Page
 
     protected static ?int $navigationSort = 814;
 
+    public static function canAccess(): bool
+    {
+        return (bool) config('settings.attendance_reports_enabled');
+    }
+
     protected string $view = 'filament.pages.attendance-by-level-and-rhythm-report';
 
     public ?int $selectedPeriodId = null;

@@ -14,6 +14,11 @@ class AttendanceForCourseReport extends Page
 
     protected static ?int $navigationSort = 816;
 
+    public static function canAccess(): bool
+    {
+        return (bool) config('settings.attendance_reports_enabled');
+    }
+
     protected string $view = 'filament.pages.attendance-for-course-report';
 
     public ?int $selectedPeriodId = null;

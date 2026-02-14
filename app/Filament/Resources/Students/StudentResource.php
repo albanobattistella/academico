@@ -158,7 +158,8 @@ class StudentResource extends Resource
                                     ->label(__('BIC'))
                                     ->nullable()
                                     ->maxLength(30),
-                            ]),
+                            ])
+                            ->visible(fn (): bool => (bool) config('settings.collect_student_banking_info')),
                     ]),
             ]);
     }
@@ -183,6 +184,11 @@ class StudentResource extends Resource
                     ->searchable(),
                 TextColumn::make('student_age')
                     ->label(__('Age')),
+                TextColumn::make('user.birthdate')
+                    ->label(__('Birthdate'))
+                    ->date()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('phone.phone_number')
                     ->label(__('Phone'))
                     ->badge(),

@@ -27,6 +27,11 @@ class ScheduledPaymentResource extends Resource
 
     protected static ?int $navigationSort = 384;
 
+    public static function canAccess(): bool
+    {
+        return (bool) config('invoicing.allow_scheduled_payments');
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return __('Accounting');

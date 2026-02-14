@@ -16,6 +16,11 @@ class ExternalReport extends Page
 
     protected static ?int $navigationSort = 830;
 
+    public static function canAccess(): bool
+    {
+        return (bool) config('settings.external_courses_enabled');
+    }
+
     protected string $view = 'filament.pages.external-report';
 
     public ?int $startFromPeriodId = null;

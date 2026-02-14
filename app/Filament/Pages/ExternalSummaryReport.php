@@ -14,6 +14,11 @@ class ExternalSummaryReport extends Page
 
     protected static ?int $navigationSort = 832;
 
+    public static function canAccess(): bool
+    {
+        return (bool) config('settings.external_courses_enabled');
+    }
+
     protected string $view = 'filament.pages.external-summary-report';
 
     public ?string $startDate = null;

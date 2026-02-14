@@ -5,6 +5,10 @@ namespace App\Filament\Resources\Students\Pages;
 use App\Filament\Resources\Students\StudentResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\RelationManagers\RelationManagerConfiguration;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Livewire;
 use Illuminate\Database\Eloquent\Model;
 
 class EditStudent extends EditRecord
@@ -27,6 +31,22 @@ class EditStudent extends EditRecord
         $data['email'] = $user?->email ?? '';
 
         return $data;
+    }
+
+    public function getRelationManagersContentComponent(): Component
+    {
+        $managers = $this->getRelationManagers();
+        $ownerRecord = $this->getRecord();
+        $managerLivewireData = ['ownerRecord' => $ownerRecord, 'pageClass' => static::class];
+
+        return Group::make(
+            collect($managers)
+                ->map(fn ($manager, $key): Livewire => Livewire::make(
+                    $normalizedClass = $this->normalizeRelationManagerClass($manager),
+                    [...$managerLivewireData, ...(($manager instanceof RelationManagerConfiguration) ? [...$manager->relationManager::getDefaultProperties(), ...$manager->getProperties()] : $manager::getDefaultProperties())],
+                )->key("{$normalizedClass}-{$key}"))
+                ->all()
+        );
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
