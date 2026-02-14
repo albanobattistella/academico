@@ -17,19 +17,27 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(InvoicingInterface::class, function () {
-            return new (config('invoicing.invoicing_system'));
+            $driver = config('invoicing.invoicing_system');
+
+            return new (config("invoicing.{$driver}.class"));
         });
 
         $this->app->bind(CertificatesInterface::class, function () {
-            return new (config('certificates-generation.style'));
+            $driver = config('certificates-generation.style');
+
+            return new (config("certificates-generation.{$driver}.class"));
         });
 
         $this->app->bind(EnrollmentSheetInterface::class, function () {
-            return new (config('enrollment-sheet.style'));
+            $driver = config('enrollment-sheet.style');
+
+            return new (config("enrollment-sheet.{$driver}.class"));
         });
 
         $this->app->bind(MailingSystemInterface::class, function () {
-            return new (config('mailing-system.mailing_system'));
+            $driver = config('mailing-system.mailing_system');
+
+            return new (config("mailing-system.{$driver}.class"));
         });
     }
 

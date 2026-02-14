@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Students\RelationManagers;
 
+use App\Filament\Resources\Enrollments\EnrollmentResource;
+use App\Filament\Resources\Students\StudentResource;
+use Filament\Actions\Action;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -34,11 +36,13 @@ class EnrollmentsRelationManager extends RelationManager
                 TextColumn::make('created_at')
                     ->label(__('Enrolled'))
                     ->date(),
+            ])
+            ->recordUrl(fn ($record) => EnrollmentResource::getUrl('edit', ['record' => $record]))
+            ->headerActions([
+                Action::make('enroll')
+                    ->label(__('Enroll in a course'))
+                    ->icon('heroicon-o-plus-circle')
+                    ->url(fn () => StudentResource::getUrl('enroll', ['record' => $this->getOwnerRecord()])),
             ]);
-    }
-
-    public function form(Schema $schema): Schema
-    {
-        return $schema->components([]);
     }
 }

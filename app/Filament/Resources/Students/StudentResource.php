@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Students;
 
 use App\Filament\Resources\Students\Pages\CreateStudent;
 use App\Filament\Resources\Students\Pages\EditStudent;
+use App\Filament\Resources\Students\Pages\EnrollStudent;
 use App\Filament\Resources\Students\Pages\ListStudents;
 use App\Filament\Resources\Students\RelationManagers\ContactsRelationManager;
 use App\Filament\Resources\Students\RelationManagers\EnrollmentsRelationManager;
@@ -225,6 +226,7 @@ class StudentResource extends Resource
             'index' => ListStudents::route('/'),
             'create' => CreateStudent::route('/create'),
             'edit' => EditStudent::route('/{record}/edit'),
+            'enroll' => EnrollStudent::route('/{record}/enroll'),
         ];
     }
 }
