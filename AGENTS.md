@@ -242,3 +242,15 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - IMPORTANT: Always use `search-docs` tool for version-specific Tailwind CSS documentation and updated code examples. Never rely on training data.
 - IMPORTANT: Activate `tailwindcss-development` every time you're working with a Tailwind CSS or styling-related task.
 </laravel-boost-guidelines>
+
+
+## Running Commands (Docker Environment)
+
+Claude Code runs inside a `claude` Docker container. PHP commands must be routed through the `app` container using wrapper scripts in `bin/`:
+
+- **Instead of** `php artisan test --compact` → **use** `bin/artisan test --compact`
+- **Instead of** `php artisan make:model Foo` → **use** `bin/artisan make:model Foo`
+- **Instead of** `php script.php` → **use** `bin/php script.php`
+
+These scripts use `docker compose exec app` under the hood, ensuring the correct PHP version, extensions, and network (pgsql, redis, etc.) are available.
+
