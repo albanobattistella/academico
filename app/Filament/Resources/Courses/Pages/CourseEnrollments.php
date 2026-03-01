@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -74,7 +75,7 @@ class CourseEnrollments extends Page implements HasTable
                 TextColumn::make('enrollmentStatus.name')
                     ->label(__('Status'))
                     ->badge()
-                    ->color(fn ($record): ?string => $record->enrollmentStatus?->color),
+                    ->color(fn ($record): ?array => $record->enrollmentStatus?->color ? Color::hex($record->enrollmentStatus->color) : null),
                 TextColumn::make('total_price')
                     ->label(__('Price'))
                     ->money(config('academico.currency_code', 'USD'))

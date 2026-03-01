@@ -6,6 +6,7 @@ use App\Filament\Resources\Enrollments\EnrollmentResource;
 use App\Filament\Resources\Students\StudentResource;
 use Filament\Actions\Action;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -25,7 +26,7 @@ class EnrollmentsRelationManager extends RelationManager
                 TextColumn::make('enrollmentStatus.name')
                     ->label(__('Status'))
                     ->badge()
-                    ->color(fn ($record): ?string => $record->enrollmentStatus?->color),
+                    ->color(fn ($record): ?array => $record->enrollmentStatus?->color ? Color::hex($record->enrollmentStatus->color) : null),
                 TextColumn::make('total_price')
                     ->label(__('Price'))
                     ->money(config('academico.currency_code', 'USD')),

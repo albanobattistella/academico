@@ -21,6 +21,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
@@ -75,7 +76,7 @@ class EnrollmentResource extends Resource
                         TextEntry::make('enrollmentStatus.name')
                             ->label(__('Status'))
                             ->badge()
-                            ->color(fn (Enrollment $record): ?string => $record->enrollmentStatus?->color),
+                            ->color(fn (Enrollment $record): ?array => $record->enrollmentStatus?->color ? Color::hex($record->enrollmentStatus->color) : null),
                         TextEntry::make('total_price')
                             ->label(__('Price'))
                             ->money(config('academico.currency_code', 'USD')),
@@ -116,7 +117,7 @@ class EnrollmentResource extends Resource
                 TextColumn::make('enrollmentStatus.name')
                     ->label(__('Status'))
                     ->badge()
-                    ->color(fn (Enrollment $record): ?string => $record->enrollmentStatus?->color),
+                    ->color(fn (Enrollment $record): ?array => $record->enrollmentStatus?->color ? Color::hex($record->enrollmentStatus->color) : null),
                 TextColumn::make('total_price')
                     ->label(__('Price'))
                     ->money(config('academico.currency_code', 'USD'))

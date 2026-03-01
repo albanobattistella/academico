@@ -10,6 +10,7 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -91,7 +92,7 @@ class ResultResource extends Resource
                     ->label(__('Result'))
                     ->sortable()
                     ->badge()
-                    ->color(fn (Enrollment $record): ?string => $record->result?->result_name?->color),
+                    ->color(fn (Enrollment $record): ?array => $record->result?->result_name?->color ? Color::hex($record->result->result_name->color) : null),
             ])
             ->defaultSort('id', 'desc')
             ->filters([
