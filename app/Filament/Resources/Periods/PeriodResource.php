@@ -82,6 +82,9 @@ class PeriodResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $currentPeriodId = Config::where('name', 'current_period')->first()?->value;
+        $enrollmentPeriodId = Config::where('name', 'default_enrollment_period')->first()?->value;
+
         return $table
             ->columns([
                 TextColumn::make('year.name')
@@ -99,6 +102,27 @@ class PeriodResource extends Resource
                     ->label(__('End Date'))
                     ->date()
                     ->sortable(),
+                TextColumn::make('id')
+                    ->label(__('Status'))
+                    ->badge()
+                    ->formatStateUsing(function (Period $record) use ($currentPeriodId, $enrollmentPeriodId) {
+                        $badges = [];
+                        if ((string) $record->id === (string) $currentPeriodId) {
+                            $badges[] = __('Current');
+                        }
+                        if ((string) $record->id === (string) $enrollmentPeriodId) {
+                            $badges[] = __('Enrollment');
+                        }
+
+                        return implode(' | ', $badges) ?: null;
+                    })
+                    ->color(fn (Period $record) => match (true) {
+                        (string) $record->id === (string) $currentPeriodId && (string) $record->id === (string) $enrollmentPeriodId => 'primary',
+                        (string) $record->id === (string) $currentPeriodId => 'success',
+                        (string) $record->id === (string) $enrollmentPeriodId => 'info',
+                        default => 'gray',
+                    })
+                    ->placeholder('-'),
                 IconColumn::make('archived')
                     ->label(__('Archived'))
                     ->boolean(),
@@ -115,6 +139,7 @@ class PeriodResource extends Resource
                     ->icon('heroicon-m-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
+                    ->hidden(fn (Period $record) => (string) $record->id === (string) $currentPeriodId)
                     ->action(function (Period $record) {
                         Config::updateOrCreate(['name' => 'current_period'], ['value' => $record->id]);
 
@@ -129,6 +154,7 @@ class PeriodResource extends Resource
                     ->icon('heroicon-m-academic-cap')
                     ->color('info')
                     ->requiresConfirmation()
+                    ->hidden(fn (Period $record) => (string) $record->id === (string) $enrollmentPeriodId)
                     ->action(function (Period $record) {
                         Config::updateOrCreate(['name' => 'default_enrollment_period'], ['value' => $record->id]);
 
