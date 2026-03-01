@@ -102,10 +102,10 @@ class PeriodResource extends Resource
                     ->label(__('End Date'))
                     ->date()
                     ->sortable(),
-                TextColumn::make('id')
+                TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
-                    ->formatStateUsing(function (Period $record) use ($currentPeriodId, $enrollmentPeriodId) {
+                    ->state(function (Period $record) use ($currentPeriodId, $enrollmentPeriodId) {
                         $badges = [];
                         if ((string) $record->id === (string) $currentPeriodId) {
                             $badges[] = __('Current');
@@ -114,15 +114,15 @@ class PeriodResource extends Resource
                             $badges[] = __('Enrollment');
                         }
 
-                        return implode(' | ', $badges) ?: null;
+                        return empty($badges) ? null : implode(' | ', $badges);
                     })
+                    ->placeholder('')
                     ->color(fn (Period $record) => match (true) {
-                        (string) $record->id === (string) $currentPeriodId && (string) $record->id === (string) $enrollmentPeriodId => 'primary',
+                        (string) $record->id === (string) $currentPeriodId && (string) $record->id === (string) $enrollmentPeriodId => 'success',
                         (string) $record->id === (string) $currentPeriodId => 'success',
                         (string) $record->id === (string) $enrollmentPeriodId => 'info',
-                        default => 'gray',
-                    })
-                    ->placeholder('-'),
+                        default => null,
+                    }),
                 IconColumn::make('archived')
                     ->label(__('Archived'))
                     ->boolean(),
