@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Models\Course;
 use App\Models\Enrollment;
-use App\Models\Period;
 use App\Models\Skills\SkillEvaluation;
 use App\Models\Skills\SkillScale;
 use BackedEnum;
@@ -24,19 +23,16 @@ class SkillEvaluationPage extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return false;
     }
 
     protected string $view = 'filament.pages.skill-evaluation';
 
-    public ?int $selectedPeriodId = null;
+    public int $courseId;
 
-    public ?int $selectedCourseId = null;
+    public string $courseName = '';
 
     public ?int $selectedEnrollmentId = null;
-
-    /** @var array<int, array<string, mixed>> */
-    public array $courses = [];
 
     /** @var array<int, array<string, mixed>> */
     public array $enrollments = [];
@@ -50,8 +46,19 @@ class SkillEvaluationPage extends Page
     /** @var array<int, int|null> */
     public array $evaluations = [];
 
+    /** @var array<string, int|null> Matrix: "enrollmentId-skillId" => scaleId */
+    public array $allEvaluations = [];
+
     public function mount(): void
     {
+        $courseId = request()->integer('courseId') ?: null;
+        $course = $courseId ? Course::find($courseId) : null;
+
+        abort_unless($course, 404);
+
+        $this->courseId = $course->id;
+        $this->courseName = $course->name;
+
         $this->scales = SkillScale::orderBy('value')->get()
             ->map(fn ($s) => [
                 'id' => $s->id,
@@ -62,74 +69,15 @@ class SkillEvaluationPage extends Page
             ])
             ->toArray();
 
-        $courseId = request()->integer('courseId') ?: null;
-
-        if ($courseId) {
-            $course = Course::find($courseId);
-            if ($course) {
-                $this->selectedPeriodId = $course->period_id;
-                $this->loadCourses();
-                $this->selectedCourseId = $course->id;
-                $this->loadEnrollments();
-
-                return;
-            }
-        }
-
-        $period = Period::get_default_period();
-        $this->selectedPeriodId = $period?->id;
-        $this->loadCourses();
-    }
-
-    public function updatedSelectedPeriodId(): void
-    {
-        $this->selectedCourseId = null;
-        $this->selectedEnrollmentId = null;
-        $this->enrollments = [];
-        $this->skills = [];
-        $this->evaluations = [];
-        $this->loadCourses();
-    }
-
-    public function updatedSelectedCourseId(): void
-    {
-        $this->selectedEnrollmentId = null;
-        $this->skills = [];
-        $this->evaluations = [];
         $this->loadEnrollments();
-    }
-
-    public function updatedSelectedEnrollmentId(): void
-    {
-        $this->loadSkillsAndEvaluations();
-    }
-
-    protected function loadCourses(): void
-    {
-        if (! $this->selectedPeriodId) {
-            return;
-        }
-
-        $this->courses = Course::where('period_id', $this->selectedPeriodId)
-            ->whereHas('enrollments')
-            ->whereHas('evaluationType')
-            ->orderBy('name')
-            ->get()
-            ->map(fn ($course) => [
-                'id' => $course->id,
-                'name' => $course->name,
-            ])
-            ->toArray();
+        $this->loadSkills();
+        $this->loadAllEvaluations();
     }
 
     protected function loadEnrollments(): void
     {
-        if (! $this->selectedCourseId) {
-            return;
-        }
-
         $this->enrollments = Enrollment::with('student')
-            ->where('course_id', $this->selectedCourseId)
+            ->where('course_id', $this->courseId)
             ->whereDoesntHave('childrenEnrollments')
             ->get()
             ->sortBy(fn ($e) => $e->student?->name)
@@ -141,14 +89,9 @@ class SkillEvaluationPage extends Page
             ->toArray();
     }
 
-    protected function loadSkillsAndEvaluations(): void
+    protected function loadSkills(): void
     {
-        if (! $this->selectedEnrollmentId || ! $this->selectedCourseId) {
-            return;
-        }
-
-        $course = Course::find($this->selectedCourseId);
-
+        $course = Course::find($this->courseId);
         $courseSkills = $course?->skills()?->get() ?? collect();
 
         $this->skills = $courseSkills->map(fn ($skill) => [
@@ -157,19 +100,89 @@ class SkillEvaluationPage extends Page
             'typeName' => $skill->skillType?->name ?? '',
             'levelName' => $skill->level?->name ?? '',
         ])->toArray();
+    }
+
+    protected function loadAllEvaluations(): void
+    {
+        $enrollmentIds = collect($this->enrollments)->pluck('id');
+        $skillIds = collect($this->skills)->pluck('id');
+
+        $evals = SkillEvaluation::whereIn('enrollment_id', $enrollmentIds)
+            ->whereIn('skill_id', $skillIds)
+            ->get();
+
+        $matrix = [];
+        foreach ($evals as $eval) {
+            $matrix[$eval->enrollment_id.'-'.$eval->skill_id] = $eval->skill_scale_id;
+        }
+
+        $this->allEvaluations = $matrix;
+    }
+
+    protected function loadSkillsAndEvaluations(): void
+    {
+        if (! $this->selectedEnrollmentId) {
+            return;
+        }
+
+        $skillIds = collect($this->skills)->pluck('id');
 
         $existingEvals = SkillEvaluation::where('enrollment_id', $this->selectedEnrollmentId)
-            ->whereIn('skill_id', $courseSkills->pluck('id'))
+            ->whereIn('skill_id', $skillIds)
             ->get()
             ->keyBy('skill_id');
 
         $evals = [];
-        foreach ($courseSkills as $skill) {
-            $eval = $existingEvals->get($skill->id);
-            $evals[$skill->id] = $eval?->skill_scale_id;
+        foreach ($this->skills as $skill) {
+            $eval = $existingEvals->get($skill['id']);
+            $evals[$skill['id']] = $eval?->skill_scale_id;
         }
 
         $this->evaluations = $evals;
+    }
+
+    public function selectStudent(int $enrollmentId): void
+    {
+        $this->selectedEnrollmentId = $enrollmentId;
+        $this->loadSkillsAndEvaluations();
+    }
+
+    public function backToOverview(): void
+    {
+        $this->selectedEnrollmentId = null;
+        $this->evaluations = [];
+        $this->loadAllEvaluations();
+    }
+
+    public function nextStudent(): void
+    {
+        $index = $this->getCurrentStudentIndex();
+        if ($index !== null && $index < count($this->enrollments) - 1) {
+            $this->selectStudent($this->enrollments[$index + 1]['id']);
+        }
+    }
+
+    public function previousStudent(): void
+    {
+        $index = $this->getCurrentStudentIndex();
+        if ($index !== null && $index > 0) {
+            $this->selectStudent($this->enrollments[$index - 1]['id']);
+        }
+    }
+
+    public function getCurrentStudentIndex(): ?int
+    {
+        if (! $this->selectedEnrollmentId) {
+            return null;
+        }
+
+        foreach ($this->enrollments as $i => $enrollment) {
+            if ($enrollment['id'] === $this->selectedEnrollmentId) {
+                return $i;
+            }
+        }
+
+        return null;
     }
 
     public function setEvaluation(int $skillId, int $scaleId): void
@@ -189,6 +202,28 @@ class SkillEvaluationPage extends Page
         );
 
         $this->evaluations[$skillId] = $scaleId;
+        $this->allEvaluations[$this->selectedEnrollmentId.'-'.$skillId] = $scaleId;
+
+        Notification::make()
+            ->success()
+            ->title(__('Skill evaluation saved'))
+            ->duration(1500)
+            ->send();
+    }
+
+    public function setEvaluationFromMatrix(int $enrollmentId, int $skillId, int $scaleId): void
+    {
+        SkillEvaluation::updateOrCreate(
+            [
+                'enrollment_id' => $enrollmentId,
+                'skill_id' => $skillId,
+            ],
+            [
+                'skill_scale_id' => $scaleId,
+            ],
+        );
+
+        $this->allEvaluations[$enrollmentId.'-'.$skillId] = $scaleId;
 
         Notification::make()
             ->success()

@@ -81,41 +81,76 @@ class SkillEvaluationPageTest extends TestCase
         $this->actingAs($admin);
     }
 
-    public function test_page_loads_skill_scales(): void
+    public function test_page_loads_with_course_data(): void
     {
-        $component = Livewire::test(SkillEvaluationPage::class);
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class);
+
+        $component->assertSet('courseId', $this->course->id);
+        $component->assertSet('courseName', $this->course->name);
 
         $scales = $component->get('scales');
         $this->assertNotEmpty($scales);
-    }
-
-    public function test_selecting_course_loads_enrollments(): void
-    {
-        $component = Livewire::test(SkillEvaluationPage::class)
-            ->set('selectedCourseId', $this->course->id);
 
         $enrollments = $component->get('enrollments');
         $enrollmentIds = collect($enrollments)->pluck('id')->toArray();
         $this->assertContains($this->enrollment->id, $enrollmentIds);
-    }
-
-    public function test_selecting_enrollment_loads_skills(): void
-    {
-        $component = Livewire::test(SkillEvaluationPage::class)
-            ->set('selectedCourseId', $this->course->id)
-            ->set('selectedEnrollmentId', $this->enrollment->id);
 
         $skills = $component->get('skills');
         $skillIds = collect($skills)->pluck('id')->toArray();
         $this->assertContains($this->skill->id, $skillIds);
     }
 
+    public function test_overview_matrix_loads_evaluations(): void
+    {
+        SkillEvaluation::create([
+            'enrollment_id' => $this->enrollment->id,
+            'skill_id' => $this->skill->id,
+            'skill_scale_id' => $this->scale->id,
+        ]);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class);
+
+        $allEvaluations = $component->get('allEvaluations');
+        $key = $this->enrollment->id.'-'.$this->skill->id;
+        $this->assertEquals($this->scale->id, $allEvaluations[$key] ?? null);
+    }
+
+    public function test_select_student_loads_detail_view(): void
+    {
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('selectStudent', $this->enrollment->id);
+
+        $component->assertSet('selectedEnrollmentId', $this->enrollment->id);
+        $evaluations = $component->get('evaluations');
+        $this->assertArrayHasKey($this->skill->id, $evaluations);
+    }
+
+    public function test_back_to_overview_clears_selection(): void
+    {
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('selectStudent', $this->enrollment->id)
+            ->call('backToOverview');
+
+        $component->assertSet('selectedEnrollmentId', null);
+    }
+
     public function test_set_evaluation_creates_record(): void
     {
-        Livewire::test(SkillEvaluationPage::class)
-            ->set('selectedCourseId', $this->course->id)
-            ->set('selectedEnrollmentId', $this->enrollment->id)
+        Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('selectStudent', $this->enrollment->id)
             ->call('setEvaluation', $this->skill->id, $this->scale->id);
+
+        $this->assertDatabaseHas('skill_evaluations', [
+            'enrollment_id' => $this->enrollment->id,
+            'skill_id' => $this->skill->id,
+            'skill_scale_id' => $this->scale->id,
+        ]);
+    }
+
+    public function test_set_evaluation_from_matrix_creates_record(): void
+    {
+        Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('setEvaluationFromMatrix', $this->enrollment->id, $this->skill->id, $this->scale->id);
 
         $this->assertDatabaseHas('skill_evaluations', [
             'enrollment_id' => $this->enrollment->id,
@@ -140,9 +175,8 @@ class SkillEvaluationPageTest extends TestCase
             'skill_scale_id' => $this->scale->id,
         ]);
 
-        Livewire::test(SkillEvaluationPage::class)
-            ->set('selectedCourseId', $this->course->id)
-            ->set('selectedEnrollmentId', $this->enrollment->id)
+        Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('selectStudent', $this->enrollment->id)
             ->call('setEvaluation', $this->skill->id, $newScale->id);
 
         $this->assertEquals(1, SkillEvaluation::where('enrollment_id', $this->enrollment->id)->where('skill_id', $this->skill->id)->count());

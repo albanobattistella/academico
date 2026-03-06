@@ -199,8 +199,6 @@ class GradeEdit extends Page
             );
         }
 
-        $gradeTypeIds = collect($this->gradeTypes)->pluck('id')->toArray();
-
         foreach ($this->enrollments as $index => $enrollment) {
             if ($enrollment['enrollmentId'] === $enrollmentId) {
                 $this->enrollments[$index]['grades'][$gradeTypeId] = $value;
