@@ -39,6 +39,25 @@ trait HasFallbackTranslations
         return '';
     }
 
+    /**
+     * Override attributesToArray so that toArray() returns the resolved
+     * translated string instead of the full translations array.
+     * The 'array' cast added by Spatie would otherwise return the raw
+     * JSON object, causing Filament forms to display [object Object].
+     */
+    public function attributesToArray(): array
+    {
+        $attributes = parent::attributesToArray();
+
+        foreach ($this->getTranslatableAttributes() as $key) {
+            if (array_key_exists($key, $attributes)) {
+                $attributes[$key] = $this->getTranslation($key, $this->getLocale());
+            }
+        }
+
+        return $attributes;
+    }
+
     public function setTranslation(string $key, string $locale, mixed $value): self
     {
         return $this->baseSetTranslation($key, 'fr', $value);
