@@ -4,11 +4,14 @@ namespace App\Filament\Pages;
 
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\Result;
+use App\Models\ResultType;
 use App\Models\Skills\SkillEvaluation;
 use App\Models\Skills\SkillScale;
 use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Gate;
 
 class SkillEvaluationPage extends Page
 {
@@ -34,6 +37,8 @@ class SkillEvaluationPage extends Page
 
     public ?int $selectedEnrollmentId = null;
 
+    public bool $isReadOnly = false;
+
     /** @var array<int, array<string, mixed>> */
     public array $enrollments = [];
 
@@ -49,6 +54,15 @@ class SkillEvaluationPage extends Page
     /** @var array<string, int|null> Matrix: "enrollmentId-skillId" => scaleId */
     public array $allEvaluations = [];
 
+    /** @var array<int, array<string, mixed>> */
+    public array $resultTypes = [];
+
+    /** @var array<int, array<string, mixed>> enrollmentId => {resultTypeId, resultTypeColor} */
+    public array $enrollmentResults = [];
+
+    /** @var array<int, string> enrollmentId => comment body */
+    public array $comments = [];
+
     public function mount(): void
     {
         $courseId = request()->integer('courseId') ?: null;
@@ -58,6 +72,8 @@ class SkillEvaluationPage extends Page
 
         $this->courseId = $course->id;
         $this->courseName = $course->name;
+
+        $this->isReadOnly = Gate::denies('edit-course-grades', $course);
 
         $this->scales = SkillScale::orderBy('value')->get()
             ->map(fn ($s) => [
@@ -69,6 +85,14 @@ class SkillEvaluationPage extends Page
             ])
             ->toArray();
 
+        $this->resultTypes = ResultType::all()
+            ->map(fn ($rt) => [
+                'id' => $rt->id,
+                'name' => $rt->name,
+                'color' => $rt->color,
+            ])
+            ->toArray();
+
         $this->loadEnrollments();
         $this->loadSkills();
         $this->loadAllEvaluations();
@@ -76,15 +100,29 @@ class SkillEvaluationPage extends Page
 
     protected function loadEnrollments(): void
     {
-        $this->enrollments = Enrollment::with('student')
+        $this->enrollmentResults = [];
+        $this->comments = [];
+
+        $enrollments = Enrollment::with(['student', 'result.result_name', 'result.comments'])
             ->where('course_id', $this->courseId)
             ->whereDoesntHave('childrenEnrollments')
             ->get()
-            ->sortBy(fn ($e) => $e->student?->name)
-            ->map(fn ($e) => [
+            ->sortBy(fn ($e) => $e->student?->name);
+
+        $this->enrollments = $enrollments->map(function ($e) {
+            $resultComment = $e->result?->comments?->first();
+            $this->comments[$e->id] = $resultComment?->body ?? '';
+
+            $this->enrollmentResults[$e->id] = [
+                'resultTypeId' => $e->result?->result_type_id,
+                'resultTypeColor' => $e->result?->result_name?->color,
+            ];
+
+            return [
                 'id' => $e->id,
                 'studentName' => $e->student?->name ?? '',
-            ])
+            ];
+        })
             ->values()
             ->toArray();
     }
@@ -187,7 +225,7 @@ class SkillEvaluationPage extends Page
 
     public function setEvaluation(int $skillId, int $scaleId): void
     {
-        if (! $this->selectedEnrollmentId) {
+        if (! $this->selectedEnrollmentId || $this->isReadOnly) {
             return;
         }
 
@@ -213,6 +251,10 @@ class SkillEvaluationPage extends Page
 
     public function setEvaluationFromMatrix(int $enrollmentId, int $skillId, int $scaleId): void
     {
+        if ($this->isReadOnly) {
+            return;
+        }
+
         SkillEvaluation::updateOrCreate(
             [
                 'enrollment_id' => $enrollmentId,
@@ -228,6 +270,72 @@ class SkillEvaluationPage extends Page
         Notification::make()
             ->success()
             ->title(__('Skill evaluation saved'))
+            ->duration(1500)
+            ->send();
+    }
+
+    public function saveResult(int $enrollmentId, string $resultTypeId): void
+    {
+        $course = Course::find($this->courseId);
+
+        if (! $course || Gate::denies('edit-course-grades', $course)) {
+            abort(403);
+        }
+
+        if ($resultTypeId === '') {
+            Result::where('enrollment_id', $enrollmentId)->delete();
+            $this->enrollmentResults[$enrollmentId] = [
+                'resultTypeId' => null,
+                'resultTypeColor' => null,
+            ];
+        } else {
+            Result::updateOrCreate(
+                ['enrollment_id' => $enrollmentId],
+                ['result_type_id' => (int) $resultTypeId],
+            );
+
+            $resultType = ResultType::find((int) $resultTypeId);
+            $this->enrollmentResults[$enrollmentId] = [
+                'resultTypeId' => $resultType?->id,
+                'resultTypeColor' => $resultType?->color,
+            ];
+        }
+
+        Notification::make()
+            ->success()
+            ->title(__('Result saved'))
+            ->duration(1500)
+            ->send();
+    }
+
+    public function saveComment(int $enrollmentId, string $body): void
+    {
+        $course = Course::find($this->courseId);
+
+        if (! $course || Gate::denies('edit-course-grades', $course)) {
+            abort(403);
+        }
+
+        $result = Result::firstOrCreate(
+            ['enrollment_id' => $enrollmentId],
+            ['result_type_id' => ResultType::first()?->id ?? 1],
+        );
+
+        $existingComment = $result->comments()->first();
+
+        if ($body === '') {
+            $existingComment?->delete();
+        } elseif ($existingComment) {
+            $existingComment->update(['body' => $body]);
+        } else {
+            $result->comments()->create(['body' => $body]);
+        }
+
+        $this->comments[$enrollmentId] = $body;
+
+        Notification::make()
+            ->success()
+            ->title(__('Comment saved'))
             ->duration(1500)
             ->send();
     }

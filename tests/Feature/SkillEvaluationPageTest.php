@@ -8,6 +8,8 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\EvaluationType;
 use App\Models\Period;
+use App\Models\Result;
+use App\Models\ResultType;
 use App\Models\Skills\Skill;
 use App\Models\Skills\SkillEvaluation;
 use App\Models\Skills\SkillScale;
@@ -72,8 +74,9 @@ class SkillEvaluationPageTest extends TestCase
         ]);
 
         Permission::findOrCreate('evaluation.view', 'web');
+        Permission::findOrCreate('evaluation.edit', 'web');
         $role = Role::findOrCreate('admin', 'web');
-        $role->givePermissionTo('evaluation.view');
+        $role->givePermissionTo(['evaluation.view', 'evaluation.edit']);
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
         $admin = User::factory()->create();
@@ -98,6 +101,17 @@ class SkillEvaluationPageTest extends TestCase
         $skills = $component->get('skills');
         $skillIds = collect($skills)->pluck('id')->toArray();
         $this->assertContains($this->skill->id, $skillIds);
+    }
+
+    public function test_page_loads_result_types(): void
+    {
+        $resultType = ResultType::factory()->create();
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class);
+
+        $resultTypes = $component->get('resultTypes');
+        $resultTypeIds = collect($resultTypes)->pluck('id')->toArray();
+        $this->assertContains($resultType->id, $resultTypeIds);
     }
 
     public function test_overview_matrix_loads_evaluations(): void
@@ -185,5 +199,137 @@ class SkillEvaluationPageTest extends TestCase
             'skill_id' => $this->skill->id,
             'skill_scale_id' => $newScale->id,
         ]);
+    }
+
+    public function test_save_result_creates_record(): void
+    {
+        $resultType = ResultType::factory()->create();
+
+        Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('saveResult', $this->enrollment->id, (string) $resultType->id);
+
+        $this->assertDatabaseHas('results', [
+            'enrollment_id' => $this->enrollment->id,
+            'result_type_id' => $resultType->id,
+        ]);
+    }
+
+    public function test_save_result_with_empty_string_deletes_result(): void
+    {
+        $resultType = ResultType::factory()->create();
+        Result::create([
+            'enrollment_id' => $this->enrollment->id,
+            'result_type_id' => $resultType->id,
+        ]);
+
+        Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('saveResult', $this->enrollment->id, '');
+
+        $this->assertDatabaseMissing('results', [
+            'enrollment_id' => $this->enrollment->id,
+        ]);
+    }
+
+    public function test_save_comment_creates_comment(): void
+    {
+        $resultType = ResultType::factory()->create();
+
+        Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('saveComment', $this->enrollment->id, 'Great progress');
+
+        $result = Result::where('enrollment_id', $this->enrollment->id)->first();
+        $this->assertNotNull($result);
+        $this->assertEquals('Great progress', $result->comments()->first()->body);
+    }
+
+    public function test_save_comment_with_empty_string_deletes_comment(): void
+    {
+        $resultType = ResultType::factory()->create();
+        $result = Result::create([
+            'enrollment_id' => $this->enrollment->id,
+            'result_type_id' => $resultType->id,
+        ]);
+        $result->comments()->create(['body' => 'Old comment']);
+
+        Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class)
+            ->call('saveComment', $this->enrollment->id, '');
+
+        $this->assertCount(0, $result->fresh()->comments);
+    }
+
+    public function test_read_only_mode_prevents_evaluation(): void
+    {
+        // Create a user without evaluation.edit permission and not the course teacher
+        Permission::findOrCreate('evaluation.view', 'web');
+        $viewRole = Role::findOrCreate('viewer', 'web');
+        $viewRole->givePermissionTo('evaluation.view');
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $viewer = User::factory()->create();
+        $viewer->assignRole('viewer');
+        $this->actingAs($viewer);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class);
+
+        $component->assertSet('isReadOnly', true);
+
+        // Evaluation should not be saved when read-only
+        $component->call('selectStudent', $this->enrollment->id)
+            ->call('setEvaluation', $this->skill->id, $this->scale->id);
+
+        $this->assertDatabaseMissing('skill_evaluations', [
+            'enrollment_id' => $this->enrollment->id,
+            'skill_id' => $this->skill->id,
+        ]);
+    }
+
+    public function test_read_only_mode_prevents_matrix_evaluation(): void
+    {
+        Permission::findOrCreate('evaluation.view', 'web');
+        $viewRole = Role::findOrCreate('viewer', 'web');
+        $viewRole->givePermissionTo('evaluation.view');
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $viewer = User::factory()->create();
+        $viewer->assignRole('viewer');
+        $this->actingAs($viewer);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class);
+
+        $component->call('setEvaluationFromMatrix', $this->enrollment->id, $this->skill->id, $this->scale->id);
+
+        $this->assertDatabaseMissing('skill_evaluations', [
+            'enrollment_id' => $this->enrollment->id,
+            'skill_id' => $this->skill->id,
+        ]);
+    }
+
+    public function test_enrollments_load_existing_results(): void
+    {
+        $resultType = ResultType::factory()->create();
+        Result::create([
+            'enrollment_id' => $this->enrollment->id,
+            'result_type_id' => $resultType->id,
+        ]);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class);
+
+        $enrollmentResults = $component->get('enrollmentResults');
+        $this->assertEquals($resultType->id, $enrollmentResults[$this->enrollment->id]['resultTypeId']);
+    }
+
+    public function test_enrollments_load_existing_comments(): void
+    {
+        $resultType = ResultType::factory()->create();
+        $result = Result::create([
+            'enrollment_id' => $this->enrollment->id,
+            'result_type_id' => $resultType->id,
+        ]);
+        $result->comments()->create(['body' => 'Test comment']);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])->test(SkillEvaluationPage::class);
+
+        $comments = $component->get('comments');
+        $this->assertEquals('Test comment', $comments[$this->enrollment->id]);
     }
 }
