@@ -1,14 +1,23 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Book;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Book::class, function (Faker $faker) {
-    return [
-        'name' => $faker->word(),
-        'price' => $faker->randomFloat(),
-        'product_code' => $faker->word(),
-    ];
-});
+/**
+ * @extends Factory<Book>
+ */
+class BookFactory extends Factory
+{
+    protected $model = Book::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+            'price' => fake()->randomFloat(2, 5, 100),
+            'product_code' => fake()->word(),
+        ];
+    }
+}

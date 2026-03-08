@@ -1,16 +1,27 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Payment::class, function (Faker $faker) {
-    return [
-        'responsable_id' => $faker->randomNumber(),
-        'invoice_id' => factory(App\Models\Invoice::class),
-        'payment_method' => $faker->word(),
-        'value' => $faker->randomFloat(),
-        'comment' => $faker->word(),
-    ];
-});
+/**
+ * @extends Factory<Payment>
+ */
+class PaymentFactory extends Factory
+{
+    protected $model = Payment::class;
+
+    public function definition(): array
+    {
+        return [
+            'responsable_id' => User::factory(),
+            'invoice_id' => Invoice::factory(),
+            'payment_method' => null,
+            'value' => fake()->numberBetween(100, 10000),
+            'comment' => fake()->optional()->sentence(),
+        ];
+    }
+}

@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -18,13 +19,13 @@ return new class extends Migration {
             $table->boolean('action')->default(false)->nullable();
             $table->integer('author_id')->unsigned()->nullable();
             $table->timestamps();
-            //$table->softDeletes();
+            // $table->softDeletes();
         });
 
         Schema::table('comments', function (Blueprint $table) {
             $table->foreign('author_id')
-            ->references('id')->on('users')
-            ->onDelete('restrict');
+                ->references('id')->on('users')
+                ->onDelete('restrict');
         });
     }
 

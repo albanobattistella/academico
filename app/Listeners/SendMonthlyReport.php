@@ -29,6 +29,6 @@ class SendMonthlyReport
             $recipients[] = ['email' => explode(',', config('settings.reports_email'))];
         }
 
-        Mail::to($recipients)->queue(new MonthlyReport());
+        Mail::to($recipients)->queue(new MonthlyReport);
     }
 }

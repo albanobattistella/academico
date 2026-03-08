@@ -15,4 +15,6 @@ return [
     'teachers_can_edit_result' => env('TEACHERS_CAN_EDIT_RESULT', false),
     'attendance_reports_enabled' => env('ATTENDANCE_REPORTS_ENABLED', false),
     'teachers_can_view_calendars' => env('TEACHERS_CAN_VIEW_CALENDARS', false),
+    'collect_student_banking_info' => env('COLLECT_STUDENT_BANKING_INFO', false),
+    'members_enabled' => env('MEMBERS_ENABLED', false),
 ];

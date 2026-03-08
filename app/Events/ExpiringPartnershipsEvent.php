@@ -10,7 +10,5 @@ class ExpiringPartnershipsEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public $partners)
-    {
-    }
+    public function __construct(public $partners) {}
 }

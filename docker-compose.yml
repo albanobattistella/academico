@@ -1,56 +1,58 @@
 services:
-    laravel.test:
-        build:
-            context: ./vendor/laravel/sail/runtimes/8.2
-            dockerfile: Dockerfile
-            args:
-                WWWGROUP: '${WWWGROUP}'
-        image: sail-8.2/app
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
-        ports:
-            - '${APP_PORT:-80}:80'
-            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
-        environment:
-            WWWUSER: '${WWWUSER}'
-            LARAVEL_SAIL: 1
-            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
-            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
-        volumes:
-            - '.:/var/www/html'
-        networks:
-            - sail
-        depends_on:
-            - mysql
-    mysql:
-        image: 'mysql/mysql-server:8.0'
-        ports:
-            - '${FORWARD_DB_PORT:-3306}:3306'
-        environment:
-            MYSQL_ROOT_PASSWORD: password
-            MYSQL_ROOT_HOST: '%'
-            MYSQL_DATABASE: afc
-            MYSQL_USER: laravel
-            MYSQL_PASSWORD: password
-            MYSQL_ALLOW_EMPTY_PASSWORD: 1
-        volumes:
-            - 'sail-mysql:/var/lib/mysql'
-            - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - mysqladmin
-                - ping
-                - '-p${DB_PASSWORD}'
-            retries: 3
-            timeout: 5s
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: academico-filament-app
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - .:/app
+      - ./storage:/app/storage
+      - ./bootstrap/cache:/app/bootstrap/cache
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - academico-network
+    environment:
+      - SERVER_NAME=:80
+      - DB_CONNECTION=mariadb
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_DATABASE=academico_filament
+      - DB_USERNAME=academico
+      - DB_PASSWORD=secret
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  mariadb:
+    image: mariadb:11
+    container_name: academico-filament-mariadb
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_DATABASE: academico_filament
+      MARIADB_USER: academico
+      MARIADB_PASSWORD: secret
+      MARIADB_ROOT_PASSWORD: secret
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - academico-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
-    sail:
-        driver: bridge
-volumes:
-    sail-mysql:
-        driver: local
+  academico-network:
+    driver: bridge
 
+volumes:
+  mariadb-data:
+    driver: local

@@ -18,9 +18,7 @@ class PendingAttendanceReminder extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(public Teacher $teacher, public $events)
-    {
-    }
+    public function __construct(public Teacher $teacher, public $events) {}
 
     /**
      * Build the message.

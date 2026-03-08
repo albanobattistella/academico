@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Tax extends Model
 {
-    use CrudTrait;
-    use LogsActivity;
+    use HasFactory, LogsActivity;
 
     protected $table = 'taxes';
 

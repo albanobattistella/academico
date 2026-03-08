@@ -1,17 +1,28 @@
 <?php
 
+namespace Database\Factories;
+
 use App\Models\Period;
 use App\Models\Year;
 use Carbon\Carbon;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Period::class, function (Faker $faker) {
-    $start = $faker->date();
+/**
+ * @extends Factory<Period>
+ */
+class PeriodFactory extends Factory
+{
+    protected $model = Period::class;
 
-    return [
-        'name' => $faker->unique()->randomNumber(),
-        'start' => Carbon::parse($start),
-        'end' => Carbon::parse($start)->addDays(90),
-        'year_id' => factory(Year::class)->create()->id,
-    ];
-});
+    public function definition(): array
+    {
+        $start = fake()->date();
+
+        return [
+            'name' => fake()->unique()->numerify('P###'),
+            'start' => Carbon::parse($start),
+            'end' => Carbon::parse($start)->addDays(90),
+            'year_id' => Year::factory(),
+        ];
+    }
+}

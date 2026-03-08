@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use App\Models\Skills\Skill;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class EvaluationType extends Model
 {
-    use CrudTrait;
+    use HasFactory;
 
     public $timestamps = false;
 

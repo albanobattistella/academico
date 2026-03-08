@@ -13,7 +13,5 @@ class CourseUpdated
     use InteractsWithSockets;
     use SerializesModels;
 
-    public function __construct(public Course $course)
-    {
-    }
+    public function __construct(public Course $course) {}
 }

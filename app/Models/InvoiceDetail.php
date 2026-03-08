@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Traits\PriceTrait;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -13,10 +13,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class InvoiceDetail extends Model
 {
-    use SoftDeletes;
-    use LogsActivity;
-    use CrudTrait;
+    use HasFactory, LogsActivity;
     use PriceTrait;
+    use SoftDeletes;
 
     protected $guarded = ['id'];
 

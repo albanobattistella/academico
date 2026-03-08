@@ -1,12 +1,21 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\ContactRelationship;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\ContactRelationship::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-    ];
-});
+/**
+ * @extends Factory<ContactRelationship>
+ */
+class ContactRelationshipFactory extends Factory
+{
+    protected $model = ContactRelationship::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+        ];
+    }
+}

@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use App\Models\Concerns\HasFallbackTranslations;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class LeaveType extends Model
 {
-    use HasTranslations;
-    use CrudTrait;
+    use HasFactory, HasFallbackTranslations;
 
     protected $guarded = ['id'];
 

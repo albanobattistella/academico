@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasFallbackTranslations;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class InvoiceType extends Model
 {
-    use HasTranslations;
+    use HasFactory, HasFallbackTranslations;
 
     public array $translatable = ['description'];
 
@@ -15,6 +16,6 @@ class InvoiceType extends Model
 
     public function getTranslatedNameAttribute()
     {
-        return $this->getTranslation('description', app()->getLocale());
+        return $this->description;
     }
 }

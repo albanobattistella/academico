@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -16,7 +17,7 @@ return new class extends Migration {
             $table->string('value')->nullable();
             $table->timestamps();
         });
-        //default enrollment period set as first period
+        // default enrollment period set as first period
         DB::table('config')->insert([
             ['name' => 'default_enrollment_period', 'value' => 1],
             ['name' => 'current_period', 'value' => null],

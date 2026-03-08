@@ -2,13 +2,14 @@
 
 namespace App\Listeners;
 
+use App\Events\ExpiringPartnershipsEvent;
 use App\Mail\ExpiringPartnershipAlert;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 class SendExpiringPartnershipsAlerts
 {
-    public function handle($event): void
+    public function handle(ExpiringPartnershipsEvent $event): void
     {
         foreach ($event->partners as $partner) {
             Mail::to(config('settings.secretary_email'))->queue(new ExpiringPartnershipAlert($partner));

@@ -15,9 +15,7 @@ class ExpiringPartnershipAlert extends Mailable
      *
      * @return void
      */
-    public function __construct(public $partner)
-    {
-    }
+    public function __construct(public $partner) {}
 
     public function build()
     {

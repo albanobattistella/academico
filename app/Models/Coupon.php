@@ -3,13 +3,12 @@
 namespace App\Models;
 
 use App\Traits\PriceTrait;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Coupon extends Model
 {
-    use CrudTrait;
-    use PriceTrait;
+    use HasFactory, PriceTrait;
 
     protected $guarded = ['id'];
 }

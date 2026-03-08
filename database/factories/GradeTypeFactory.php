@@ -1,16 +1,24 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
+use App\Models\GradeType;
 use App\Models\GradeTypeCategory;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\GradeType::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-        'total' => $faker->randomNumber(),
-        'grade_type_category_id' => factory(GradeTypeCategory::class)->create()->id,
-        'deleted_at' => $faker->dateTime(),
-    ];
-});
+/**
+ * @extends Factory<GradeType>
+ */
+class GradeTypeFactory extends Factory
+{
+    protected $model = GradeType::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+            'total' => fake()->numberBetween(10, 100),
+            'grade_type_category_id' => GradeTypeCategory::factory(),
+        ];
+    }
+}

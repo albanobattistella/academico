@@ -1,12 +1,21 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\EvaluationType;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\EvaluationType::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-    ];
-});
+/**
+ * @extends Factory<EvaluationType>
+ */
+class EvaluationTypeFactory extends Factory
+{
+    protected $model = EvaluationType::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+        ];
+    }
+}

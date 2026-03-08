@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,8 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class CourseTime extends Model
 {
-    use LogsActivity;
-    use CrudTrait;
+    use HasFactory, LogsActivity;
 
     public $timestamps = false;
 

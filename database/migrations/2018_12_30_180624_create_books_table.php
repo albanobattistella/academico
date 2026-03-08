@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -14,7 +15,7 @@ return new class extends Migration {
             $table->increments('id');
             $table->string('name');
             $table->bigInteger('price')->nullable();
-            //$table->timestamps();
+            // $table->timestamps();
         });
 
         Schema::create('book_course', function (Blueprint $table) {
@@ -25,14 +26,14 @@ return new class extends Migration {
 
         Schema::table('book_course', function (Blueprint $table) {
             $table->foreign('book_id')
-            ->references('id')->on('books')
-            ->onDelete('restrict');
+                ->references('id')->on('books')
+                ->onDelete('restrict');
         });
 
         Schema::table('book_course', function (Blueprint $table) {
             $table->foreign('course_id')
-            ->references('id')->on('courses')
-            ->onDelete('cascade');
+                ->references('id')->on('courses')
+                ->onDelete('cascade');
         });
     }
 

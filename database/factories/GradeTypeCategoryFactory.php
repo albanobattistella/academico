@@ -1,12 +1,21 @@
 <?php
 
-/* @var Factory $factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\GradeTypeCategory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\GradeTypeCategory::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-    ];
-});
+/**
+ * @extends Factory<GradeTypeCategory>
+ */
+class GradeTypeCategoryFactory extends Factory
+{
+    protected $model = GradeTypeCategory::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+        ];
+    }
+}

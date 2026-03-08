@@ -1,12 +1,21 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\LeaveType;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\LeaveType::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-    ];
-});
+/**
+ * @extends Factory<LeaveType>
+ */
+class LeaveTypeFactory extends Factory
+{
+    protected $model = LeaveType::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+        ];
+    }
+}

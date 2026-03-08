@@ -4,13 +4,12 @@ namespace App\Models;
 
 use App\Models\Interfaces\InvoiceableModel;
 use App\Traits\PriceTrait;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Fee extends Model implements InvoiceableModel
 {
-    use CrudTrait;
-    use PriceTrait;
+    use HasFactory, PriceTrait;
 
     public $timestamps = false;
 

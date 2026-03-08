@@ -1,14 +1,23 @@
 <?php
 
+namespace Database\Factories;
+
 use App\Models\Teacher;
 use App\Models\User;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Teacher::class, function (Faker $faker) {
-    $user = factory(User::class)->create();
+/**
+ * @extends Factory<Teacher>
+ */
+class TeacherFactory extends Factory
+{
+    protected $model = Teacher::class;
 
-    return [
-        'id' => $user->fresh()->id,
-        'max_week_hours' => 25,
-    ];
-});
+    public function definition(): array
+    {
+        return [
+            'id' => User::factory(),
+            'max_week_hours' => fake()->numberBetween(10, 40),
+        ];
+    }
+}

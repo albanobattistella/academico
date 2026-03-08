@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
-use Backpack\CRUD\app\Models\Traits\SpatieTranslatable\HasTranslations;
+use App\Models\Concerns\HasFallbackTranslations;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class GradeTypeCategory extends Model
 {
-    use CrudTrait;
-    use HasTranslations;
+    use HasFactory, HasFallbackTranslations;
 
     protected $table = 'grade_type_categories';
 
@@ -23,6 +22,6 @@ class GradeTypeCategory extends Model
 
     public function getTranslatedNameAttribute()
     {
-        return $this->getTranslation('name', app()->getLocale());
+        return $this->name;
     }
 }

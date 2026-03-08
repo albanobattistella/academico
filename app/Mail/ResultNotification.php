@@ -17,9 +17,7 @@ class ResultNotification extends Mailable
      *
      * @return void
      */
-    public function __construct(public Course $course, public $student)
-    {
-    }
+    public function __construct(public Course $course, public $student) {}
 
     /**
      * Build the message.

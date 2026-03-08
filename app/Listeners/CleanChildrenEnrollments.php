@@ -29,7 +29,6 @@ class CleanChildrenEnrollments
             }
 
             // TODO delete grades and/or skills
-            // TODO dispatch event to LMS
         }
 
         // If the status has changed to paid, also update children

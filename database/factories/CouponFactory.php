@@ -1,13 +1,22 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Coupon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Coupon::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-        'value' => $faker->randomFloat(),
-    ];
-});
+/**
+ * @extends Factory<Coupon>
+ */
+class CouponFactory extends Factory
+{
+    protected $model = Coupon::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+            'value' => fake()->randomFloat(2, 1, 100),
+        ];
+    }
+}

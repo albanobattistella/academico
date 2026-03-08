@@ -1,12 +1,21 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Profession;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Profession::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-    ];
-});
+/**
+ * @extends Factory<Profession>
+ */
+class ProfessionFactory extends Factory
+{
+    protected $model = Profession::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->jobTitle(),
+        ];
+    }
+}

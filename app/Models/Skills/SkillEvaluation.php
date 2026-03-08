@@ -3,7 +3,7 @@
 namespace App\Models\Skills;
 
 use App\Models\Enrollment;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
@@ -11,8 +11,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class SkillEvaluation extends Model
 {
-    use CrudTrait;
-    use LogsActivity;
+    use HasFactory, LogsActivity;
 
     protected $guarded = ['id'];
 
@@ -36,5 +35,10 @@ class SkillEvaluation extends Model
     public function skill_scale(): BelongsTo
     {
         return $this->belongsTo(SkillScale::class);
+    }
+
+    protected static function newFactory(): \Database\Factories\SkillEvaluationFactory
+    {
+        return \Database\Factories\SkillEvaluationFactory::new();
     }
 }

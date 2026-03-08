@@ -1,14 +1,25 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Leave;
+use App\Models\LeaveType;
+use App\Models\Teacher;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Leave::class, function (Faker $faker) {
-    return [
-        'teacher_id' => factory(App\Models\Teacher::class),
-        'date' => $faker->date(),
-        'leave_type_id' => factory(App\Models\LeaveType::class),
-    ];
-});
+/**
+ * @extends Factory<Leave>
+ */
+class LeaveFactory extends Factory
+{
+    protected $model = Leave::class;
+
+    public function definition(): array
+    {
+        return [
+            'teacher_id' => Teacher::factory(),
+            'date' => fake()->date(),
+            'leave_type_id' => LeaveType::factory(),
+        ];
+    }
+}

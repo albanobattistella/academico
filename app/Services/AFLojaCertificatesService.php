@@ -22,16 +22,16 @@ class AFLojaCertificatesService implements CertificatesInterface
 
     public function exportCertificate(Enrollment $enrollment)
     {
-        if (Gate::forUser(backpack_user())->denies('view-enrollment', $enrollment)) {
+        if (Gate::forUser(auth()->user())->denies('view-enrollment', $enrollment)) {
             abort(403);
         }
 
         App::setLocale('es');
 
-        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $defaultConfig = (new ConfigVariables)->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
 
-        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $defaultFontConfig = (new FontVariables)->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
         $mpdf = new Mpdf(['mode' => 'utf-8',
@@ -56,16 +56,16 @@ class AFLojaCertificatesService implements CertificatesInterface
 
     public function exportCourseResults(Course $course)
     {
-        if (Gate::forUser(backpack_user())->denies('view-course', $course)) {
+        if (Gate::forUser(auth()->user())->denies('view-course', $course)) {
             abort(403);
         }
 
         App::setLocale('es');
 
-        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $defaultConfig = (new ConfigVariables)->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
 
-        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $defaultFontConfig = (new FontVariables)->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
         $mpdf = new Mpdf(['mode' => 'utf-8',
@@ -90,16 +90,16 @@ class AFLojaCertificatesService implements CertificatesInterface
 
     public function exportResult(Enrollment $enrollment)
     {
-        if (Gate::forUser(backpack_user())->denies('view-enrollment', $enrollment)) {
+        if (Gate::forUser(auth()->user())->denies('view-enrollment', $enrollment)) {
             abort(403);
         }
 
         App::setLocale('es');
 
-        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $defaultConfig = (new ConfigVariables)->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
 
-        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $defaultFontConfig = (new FontVariables)->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
         $mpdf = new Mpdf(['mode' => 'utf-8',

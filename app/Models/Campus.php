@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use App\Models\Concerns\HasFallbackTranslations;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Translatable\HasTranslations;
 
 /**
  * NOTE: In the current configuration, the campus with the ID of 1 represent the school itself
@@ -13,9 +13,8 @@ use Spatie\Translatable\HasTranslations;
  */
 class Campus extends Model
 {
-    use CrudTrait;
+    use HasFactory, HasFallbackTranslations;
     use SoftDeletes;
-    use HasTranslations;
 
     public array $translatable = ['name'];
 

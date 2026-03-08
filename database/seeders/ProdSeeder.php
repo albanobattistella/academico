@@ -7,7 +7,6 @@ use App\Models\Campus;
 use App\Models\ContactRelationship;
 use App\Models\EnrollmentStatusType;
 use App\Models\EvaluationType;
-use App\Models\LeadType;
 use App\Models\LeaveType;
 use App\Models\Paymentmethod;
 use App\Models\Period;
@@ -173,66 +172,6 @@ class ProdSeeder extends Seeder
             'name' => ['fr' => 'MALADIE', 'es' => 'ENFERMEDAD', 'en' => 'SICK LEAVE'],
         ]);
 
-        LeadType::create([
-            'id' => '1',
-            'name' => [
-                'fr' => 'Actif',
-                'en' => 'Active',
-                'es' => 'Activo',
-            ],
-            'description' => [
-                'fr' => 'Inscrit maintenant',
-                'en' => 'Currently enrolled',
-                'es' => 'Matriculado ahora',
-            ],
-            'icon' => 'la-check',
-        ]);
-
-        LeadType::create([
-            'id' => '2',
-            'name' => [
-                'fr' => 'Inactif',
-                'en' => 'Inactive',
-                'es' => 'Inactivo',
-            ],
-            'description' => [
-                'fr' => 'Non disponible maintenant',
-                'en' => 'Currently unavailable',
-                'es' => 'No esta disponible ahora',
-            ],
-            'icon' => 'la-calendar-times',
-        ]);
-
-        LeadType::create([
-            'id' => '3',
-            'name' => [
-                'fr' => 'Ancien client',
-                'en' => 'Former client',
-                'es' => 'Clientes antiguos',
-            ],
-            'description' => [
-                'fr' => 'Cursus terminé ou abandon définitif',
-                'en' => 'Permanently ended their learning',
-                'es' => 'Acabó su aprendizaje o no regresará',
-            ],
-            'icon' => 'la-certificate',
-        ]);
-
-        LeadType::create([
-            'id' => '4',
-            'name' => [
-                'fr' => 'Client potentiel',
-                'en' => 'Potential Client',
-                'es' => 'Cliente potencial',
-            ],
-            'description' => [
-                'fr' => 'Inscription attendue pour ce cycle',
-                'en' => 'Expected enrollment for this session',
-                'es' => 'Deberia matricularse este ciclo',
-            ],
-            'icon' => 'la-user-circle',
-        ]);
-
         Paymentmethod::create(['id' => '1', 'name' => 'Credit Card', 'code' => 'TC']);
         Paymentmethod::create(['id' => '2', 'name' => 'Cash', 'code' => 'EFECT']);
 
@@ -290,6 +229,9 @@ class ProdSeeder extends Seeder
         $role->givePermissionTo('enrollments.edit');
         $role->givePermissionTo('courses.view');
         $role->givePermissionTo('leads.manage');
+
+        // viewers can access the panel but have no resource permissions
+        Role::create(['name' => 'viewer']);
 
         $admin = factory(User::class)->create([
             'email' => 'admin@academico.site',

@@ -1,15 +1,25 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Course;
+use App\Models\CourseTime;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\CourseTime::class, function (Faker $faker) {
-    return [
-        'course_id' => factory(App\Models\Course::class),
-        'day' => $faker->numberBetween(0, 6),
-        'start' => $faker->time(),
-        'end' => $faker->time(),
-    ];
-});
+/**
+ * @extends Factory<CourseTime>
+ */
+class CourseTimeFactory extends Factory
+{
+    protected $model = CourseTime::class;
+
+    public function definition(): array
+    {
+        return [
+            'course_id' => Course::factory(),
+            'day' => fake()->numberBetween(0, 6),
+            'start' => fake()->time(),
+            'end' => fake()->time(),
+        ];
+    }
+}

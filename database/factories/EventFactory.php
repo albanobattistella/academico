@@ -1,18 +1,29 @@
 <?php
 
+namespace Database\Factories;
+
 use App\Models\Course;
 use App\Models\Event;
 use App\Models\Room;
 use App\Models\Teacher;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Event::class, function (Faker $faker) {
-    return [
-        'teacher_id' => factory(Teacher::class)->create()->id,
-        'course_id' => factory(Course::class)->create()->id,
-        'room_id' => factory(Room::class)->create()->id,
-        'start' => $faker->dateTime(),
-        'end' => $faker->dateTime(),
-        'name' => $faker->word(),
-    ];
-});
+/**
+ * @extends Factory<Event>
+ */
+class EventFactory extends Factory
+{
+    protected $model = Event::class;
+
+    public function definition(): array
+    {
+        return [
+            'teacher_id' => Teacher::factory(),
+            'course_id' => Course::factory(),
+            'room_id' => Room::factory(),
+            'start' => fake()->dateTime(),
+            'end' => fake()->dateTime(),
+            'name' => fake()->word(),
+        ];
+    }
+}

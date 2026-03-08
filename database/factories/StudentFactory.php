@@ -1,14 +1,26 @@
 <?php
 
-use App\Models\User;
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(App\Models\Student::class, function (Faker $faker) {
-    return [
-        'idnumber' => $faker->randomNumber($nbDigits = 8),
-        'address' => $faker->streetAddress(),
-        'birthdate' => $faker->dateTimeThisCentury()->format('Y-m-d'),
-        'id' => factory(User::class)->create()->id,
-        'gender_id' => rand(0, 2),
-    ];
-});
+use App\Models\Student;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Student>
+ */
+class StudentFactory extends Factory
+{
+    protected $model = Student::class;
+
+    public function definition(): array
+    {
+        return [
+            'id' => User::factory(),
+            'idnumber' => fake()->optional()->numerify('########'),
+            'address' => fake()->optional()->address(),
+            'birthdate' => fake()->optional()->date(),
+            'gender_id' => fake()->optional()->numberBetween(1, 3),
+        ];
+    }
+}

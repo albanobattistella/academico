@@ -2,19 +2,21 @@
 
 namespace App\Listeners;
 
+use App\Events\InvoiceDeleting;
 use App\Models\Invoice;
+
 use function Sentry\captureMessage;
 
 class MarkProductsAsUnpaid
 {
-    public function handle($event): void
+    public function handle(InvoiceDeleting $event): void
     {
         /** @var Invoice $invoice */
         $invoice = $event->invoice;
 
         foreach ($invoice->enrollments as $enrollment) {
             if ($enrollment->product) {
-                //$enrollment->product->markAsUnpaid();
+                // $enrollment->product->markAsUnpaid();
             } else {
                 captureMessage('Unable to delete invoice for enrollment #'.$enrollment->id);
             }

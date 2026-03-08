@@ -1,15 +1,25 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Enrollment;
+use App\Models\Grade;
+use App\Models\GradeType;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Grade::class, function (Faker $faker) {
-    return [
-        'grade_type_id' => factory(App\Models\GradeType::class),
-        'enrollment_id' => factory(App\Models\Enrollment::class),
-        'grade' => $faker->randomFloat(),
-        'deleted_at' => $faker->dateTime(),
-    ];
-});
+/**
+ * @extends Factory<Grade>
+ */
+class GradeFactory extends Factory
+{
+    protected $model = Grade::class;
+
+    public function definition(): array
+    {
+        return [
+            'grade_type_id' => GradeType::factory(),
+            'enrollment_id' => Enrollment::factory(),
+            'grade' => fake()->randomFloat(2, 0, 20),
+        ];
+    }
+}

@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -21,7 +22,7 @@ return new class extends Migration {
         // this table means to display all grade types attached to the course
         // however, the students' records are related to the 'grade' model.
         Schema::create('course_grade_type', function (Blueprint $table) {
-            //$table->increments('id');
+            // $table->increments('id');
             $table->integer('course_id')->unsigned();
             $table->integer('grade_type_id')->unsigned();
             $table->timestamps();
@@ -30,18 +31,18 @@ return new class extends Migration {
 
         Schema::table('grades', function (Blueprint $table) {
             $table->foreign('grade_type_id')
-            ->references('id')->on('grade_types')
-            ->onDelete('restrict');
+                ->references('id')->on('grade_types')
+                ->onDelete('restrict');
         });
 
         Schema::table('course_grade_type', function (Blueprint $table) {
             $table->foreign('course_id')
-            ->references('id')->on('courses')
-            ->onDelete('cascade');
+                ->references('id')->on('courses')
+                ->onDelete('cascade');
 
             $table->foreign('grade_type_id')
-            ->references('id')->on('grade_types')
-            ->onDelete('cascade');
+                ->references('id')->on('grade_types')
+                ->onDelete('cascade');
         });
     }
 

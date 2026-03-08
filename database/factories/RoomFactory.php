@@ -1,10 +1,23 @@
 <?php
 
-use App\Models\Room;
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(Room::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->word(),
-    ];
-});
+use App\Models\Campus;
+use App\Models\Room;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Room>
+ */
+class RoomFactory extends Factory
+{
+    protected $model = Room::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->unique()->word(),
+            'campus_id' => Campus::factory(),
+        ];
+    }
+}

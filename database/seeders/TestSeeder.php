@@ -7,7 +7,6 @@ use App\Models\Campus;
 use App\Models\ContactRelationship;
 use App\Models\EnrollmentStatusType;
 use App\Models\EvaluationType;
-use App\Models\LeadType;
 use App\Models\LeaveType;
 use App\Models\Level;
 use App\Models\Paymentmethod;
@@ -232,11 +231,6 @@ class TestSeeder extends Seeder
             'name' => ['fr' => 'MALADIE', 'es' => 'ENFERMEDAD', 'en' => 'SICK LEAVE'],
         ]);
 
-        LeadType::create(['id' => '1', 'name' => 'Active']);
-        LeadType::create(['id' => '2', 'name' => 'Inactive']);
-        LeadType::create(['id' => '3', 'name' => 'FormerClient']);
-        LeadType::create(['id' => '4', 'name' => 'Potential']);
-
         Paymentmethod::create(['id' => '1', 'name' => 'Tarjeta de Crédito', 'code' => 'TC']);
         Paymentmethod::create(['id' => '2', 'name' => 'Crédito', 'code' => 'CRC']);
         Paymentmethod::create(['id' => '3', 'name' => 'Efectivo', 'code' => 'EFECT']);
@@ -296,6 +290,9 @@ class TestSeeder extends Seeder
         $role->givePermissionTo('enrollments.edit');
         $role->givePermissionTo('courses.view');
         $role->givePermissionTo('leads.manage');
+
+        // viewers can access the panel but have no resource permissions
+        Role::create(['name' => 'viewer']);
 
         $admin = factory(User::class)->create([
             'email' => 'admin@academico.site',

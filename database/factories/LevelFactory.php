@@ -1,10 +1,21 @@
 <?php
 
-use App\Models\Level;
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(Level::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->word(),
-    ];
-});
+use App\Models\Level;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Level>
+ */
+class LevelFactory extends Factory
+{
+    protected $model = Level::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->unique()->word(),
+        ];
+    }
+}

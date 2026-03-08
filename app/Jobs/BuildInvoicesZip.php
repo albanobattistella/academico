@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\File;
 use Ramsey\Uuid\Uuid;
 use ZipArchive;
 
-class BuildInvoicesZip implements ShouldQueue, ShouldBeUnique
+class BuildInvoicesZip implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -24,7 +24,7 @@ class BuildInvoicesZip implements ShouldQueue, ShouldBeUnique
     /**
      * Create a new job instance.
      *
-     * @param string[] $entries
+     * @param  string[]  $entries
      * @return void
      */
     public function __construct(
@@ -54,7 +54,7 @@ class BuildInvoicesZip implements ShouldQueue, ShouldBeUnique
             }
         }
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $files = File::files(storage_path('app'.DIRECTORY_SEPARATOR.$folder));
         if ($zip->open(storage_path($folder.'.zip'), ZipArchive::CREATE) == true) {
             foreach ($files as $file) {

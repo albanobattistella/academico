@@ -1,13 +1,22 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Config;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Config::class, function (Faker $faker) {
-    return [
-        'name' => $faker->word(),
-        'value' => $faker->word(),
-    ];
-});
+/**
+ * @extends Factory<Config>
+ */
+class ConfigFactory extends Factory
+{
+    protected $model = Config::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+            'value' => fake()->word(),
+        ];
+    }
+}

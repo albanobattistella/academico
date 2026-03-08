@@ -1,10 +1,21 @@
 <?php
 
-use App\Models\Campus;
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(Campus::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->word(),
-    ];
-});
+use App\Models\Campus;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Campus>
+ */
+class CampusFactory extends Factory
+{
+    protected $model = Campus::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->unique()->word(),
+        ];
+    }
+}

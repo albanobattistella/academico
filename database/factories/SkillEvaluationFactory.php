@@ -1,15 +1,26 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Enrollment;
+use App\Models\Skills\Skill;
+use App\Models\Skills\SkillEvaluation;
+use App\Models\Skills\SkillScale;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Skills\SkillEvaluation::class, function (Faker $faker) {
-    return [
-        'enrollment_id' => factory(App\Models\Enrollment::class),
-        'skill_scale_id' => factory(App\Models\Skills\SkillScale::class),
-        'skill_id' => factory(App\Models\Skills\Skill::class),
-        'deleted_at' => $faker->dateTime(),
-    ];
-});
+/**
+ * @extends Factory<SkillEvaluation>
+ */
+class SkillEvaluationFactory extends Factory
+{
+    protected $model = SkillEvaluation::class;
+
+    public function definition(): array
+    {
+        return [
+            'enrollment_id' => Enrollment::factory(),
+            'skill_id' => Skill::factory(),
+            'skill_scale_id' => SkillScale::factory(),
+        ];
+    }
+}

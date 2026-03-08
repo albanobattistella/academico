@@ -10,9 +10,7 @@ class ExternalCourseReport extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public $period_start, public $period_end, public $data)
-    {
-    }
+    public function __construct(public $period_start, public $period_end, public $data) {}
 
     public function build()
     {

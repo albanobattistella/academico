@@ -11,7 +11,5 @@ class EnrollmentDeleting
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public Enrollment $enrollment)
-    {
-    }
+    public function __construct(public Enrollment $enrollment) {}
 }

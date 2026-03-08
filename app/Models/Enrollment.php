@@ -8,10 +8,10 @@ use App\Events\EnrollmentUpdated;
 use App\Events\EnrollmentUpdating;
 use App\Models\Interfaces\InvoiceableModel;
 use App\Models\Skills\SkillEvaluation;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,8 +24,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Enrollment extends Model implements InvoiceableModel
 {
-    use CrudTrait;
-    use LogsActivity;
+    use HasFactory, LogsActivity;
 
     public const ENROLLMENT_STATUSES_TO_COUNT_IN_STATS = ['1', '2'];
 
@@ -59,8 +58,8 @@ class Enrollment extends Model implements InvoiceableModel
     public function scopeParent($query)
     {
         return $query
-        ->where('parent_id', null)
-        ->get();
+            ->where('parent_id', null)
+            ->get();
     }
 
     public function scopeReal($query)
@@ -76,7 +75,7 @@ class Enrollment extends Model implements InvoiceableModel
         return $query
             ->where(function ($query) {
                 $query->whereDoesntHave('childrenEnrollments')
-                ->where('parent_id', null);
+                    ->where('parent_id', null);
             })
             ->orWhere(function ($query) {
                 $query->where('parent_id', null);

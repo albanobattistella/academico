@@ -3,33 +3,26 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ForceUpdate
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Request  $request
-     * @return mixed
-     */
-    public function handle(HttpRequest $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        if (Request::isMethod('post')) {
+        // Allow POST requests through so form submissions work
+        if ($request->isMethod('post')) {
             return $next($request);
         }
 
-        // if the current user has a forceupdate field set, we check that they can only access this route or a lower forceupdate step
+        $user = $request->user();
 
-        if (backpack_user() != null) {
-            if (backpack_user()->isStudent()) {
-                if (backpack_user()->student->force_update) {
-                    // if the user wants to go further than authorized, redirect them to the current step
-                    if ($request->path() != 'edit/'.backpack_user()->student->force_update) {
-                        return redirect(url('edit/'.backpack_user()->student->force_update));
-                    }
-                }
+        if ($user && $user->isStudent() && $user->student?->force_update) {
+            $accountRoute = route('student.account');
+
+            // If not already on the account page, redirect there
+            if (! $request->is('account*')) {
+                return redirect($accountRoute);
             }
         }
 

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,8 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Period extends Model
 {
-    use CrudTrait;
-    use LogsActivity;
+    use HasFactory, LogsActivity;
 
     public $timestamps = false;
 
@@ -27,7 +26,7 @@ class Period extends Model
         parent::boot();
 
         static::addGlobalScope('order', function (Builder $builder) {
-            $builder->orderByDesc('year_id')->orderByDesc('order')->orderByDesc('id');
+            $builder->orderByDesc('periods.year_id')->orderByDesc('periods.order')->orderByDesc('periods.id');
         });
     }
 
@@ -35,7 +34,7 @@ class Period extends Model
     {
         $query->where(function (Builder $query) {
             $query->where('archived', false)
-            ->orWhere('archived', null);
+                ->orWhere('archived', null);
         });
     }
 
@@ -107,8 +106,8 @@ class Period extends Model
     public function real_enrollments(): HasManyThrough
     {
         return $this->hasManyThrough(Enrollment::class, Course::class)
-        ->whereIn('status_id', ['1', '2']) // pending or paid
-        ->where('parent_id', null);
+            ->whereIn('status_id', ['1', '2']) // pending or paid
+            ->where('parent_id', null);
     }
 
     public function previousPeriod()
@@ -171,8 +170,8 @@ class Period extends Model
                 foreach ($course->enrollments as $enrollment) {
                     // if a student has no attendance record for the class (event)
                     $hasNotAttended = $course->attendance->where('student_id', $enrollment->student_id)
-                     ->where('event_id', $event->id)
-                     ->isEmpty();
+                        ->where('event_id', $event->id)
+                        ->isEmpty();
 
                     // count one and break loop
                     if ($hasNotAttended) {

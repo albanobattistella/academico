@@ -1,45 +1,52 @@
-FROM node:20-alpine AS assets
+# Use FrankenPHP with PHP 8.5
+FROM dunglas/frankenphp:1-php8.5
+
+# Set working directory
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm install --legacy-peer-deps
-COPY . .
-RUN npm run prod
 
-FROM dunglas/frankenphp:php8.3
-
-RUN install-php-extensions \
-    gd \
-    intl \
-    zip \
-    pdo_mysql \
-    opcache \
-    exif \
-    bcmath
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
     git \
+    curl \
+    libpng-dev \
+    libxml2-dev \
+    zip \
     unzip \
+    libonig-dev \
+    default-mysql-client \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install PHP extensions
+RUN install-php-extensions \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    xml \
+    opcache \
+    intl \
+    zip
 
-WORKDIR /app
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-COPY composer.json composer.lock ./
-COPY auth.json /root/.composer/auth.json
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
-
+# Copy application files
 COPY . .
-COPY --from=assets /app/public/js public/js
-COPY --from=assets /app/public/mix-manifest.json public/mix-manifest.json
 
-RUN composer dump-autoload --optimize --no-dev --no-scripts \
-    && php artisan storage:link || true
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Install Node dependencies and build assets
+RUN npm install && npm run build
+
+# Set permissions
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-COPY Caddyfile /etc/caddy/Caddyfile
+# Expose port 80 and 443 for HTTP and HTTPS
+EXPOSE 80 443
 
-ENV SERVER_NAME=":80"
-
-EXPOSE 80
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use App\Events\StudentDeleting;
 use App\Events\StudentUpdated;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,15 +17,14 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Image\Manipulations;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Student extends Model implements HasMedia
 {
-    use CrudTrait;
-    use InteractsWithMedia;
+    use HasFactory, InteractsWithMedia;
     use LogsActivity;
 
     protected $dispatchesEvents = [
@@ -62,10 +61,10 @@ class Student extends Model implements HasMedia
         return $query->whereIn('id', Period::find($periodId)->newStudents()->pluck(['student_id'])->toArray());
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')
-            ->fit(Manipulations::FIT_MAX, 1200, 1200)
+            ->fit(Fit::Max, 1200, 1200)
             ->optimize();
     }
 
@@ -82,7 +81,7 @@ class Student extends Model implements HasMedia
                 'course_id' => $course->id,
             ],
             [
-                'responsible_id' => backpack_user()->id ?? 1,
+                'responsible_id' => auth()->id() ?? 1,
             ]
         );
 
@@ -96,7 +95,7 @@ class Student extends Model implements HasMedia
                         'parent_id' => $enrollment->id,
                     ],
                     [
-                        'responsible_id' => backpack_user()->id ?? 1,
+                        'responsible_id' => auth()->id() ?? 1,
                     ]
                 );
             }
@@ -123,25 +122,25 @@ class Student extends Model implements HasMedia
         return $this->hasMany(Attendance::class);
     }
 
-    public function periodAbsences(Period $period = null): HasMany
+    public function periodAbsences(?Period $period = null): HasMany
     {
         if ($period == null) {
             $period = Period::get_default_period();
         }
 
         return $this->hasMany(Attendance::class)
-        ->where('attendance_type_id', 4) // absence
-        ->whereHas('event', fn ($q) => $q->whereHas('course', fn ($c) => $c->where('period_id', $period->id)));
+            ->where('attendance_type_id', 4) // absence
+            ->whereHas('event', fn ($q) => $q->whereHas('course', fn ($c) => $c->where('period_id', $period->id)));
     }
 
-    public function periodAttendance(Period $period = null): HasMany
+    public function periodAttendance(?Period $period = null): HasMany
     {
         if ($period == null) {
             $period = Period::get_default_period();
         }
 
         return $this->hasMany(Attendance::class)
-        ->whereHas('event', fn ($q) => $q->whereHas('course', fn ($c) => $c->where('period_id', $period->id)));
+            ->whereHas('event', fn ($q) => $q->whereHas('course', fn ($c) => $c->where('period_id', $period->id)));
     }
 
     public function contacts(): HasMany
@@ -164,11 +163,6 @@ class Student extends Model implements HasMedia
         return $this->hasMany(Enrollment::class)
             ->with('course')
             ->orderByDesc('created_at');
-    }
-
-    public function leadType(): BelongsTo
-    {
-        return $this->belongsTo(LeadType::class);
     }
 
     public function institution(): BelongsTo

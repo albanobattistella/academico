@@ -20,9 +20,7 @@ class WatchAttendance implements ShouldQueue
 
     public int $tries = 5;
 
-    public function __construct(protected Attendance $attendance)
-    {
-    }
+    public function __construct(protected Attendance $attendance) {}
 
     /**
      * Execute the job.
@@ -50,9 +48,9 @@ class WatchAttendance implements ShouldQueue
             }
 
             Mail::to($student->user->email)
-            ->locale($student->user->locale)
-            ->cc($otherRecipients)
-            ->queue(new AbsenceNotification($this->attendance->event, $student->user));
+                ->locale($student->user->locale)
+                ->cc($otherRecipients)
+                ->queue(new AbsenceNotification($this->attendance->event, $student->user));
         }
     }
 }

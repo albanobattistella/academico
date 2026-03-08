@@ -1,14 +1,23 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\PhoneNumber;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\PhoneNumber::class, function (Faker $faker) {
-    return [
-        'phoneable_id' => $faker->randomNumber(),
-        'phoneable_type' => $faker->word(),
-        'phone_number' => $faker->phoneNumber(),
-    ];
-});
+/**
+ * @extends Factory<PhoneNumber>
+ */
+class PhoneNumberFactory extends Factory
+{
+    protected $model = PhoneNumber::class;
+
+    public function definition(): array
+    {
+        return [
+            'phoneable_id' => fake()->randomNumber(),
+            'phoneable_type' => fake()->word(),
+            'phone_number' => fake()->phoneNumber(),
+        ];
+    }
+}

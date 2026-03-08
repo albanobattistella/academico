@@ -1,13 +1,22 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Paymentmethod;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Paymentmethod::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-        'code' => $faker->word(),
-    ];
-});
+/**
+ * @extends Factory<Paymentmethod>
+ */
+class PaymentmethodFactory extends Factory
+{
+    protected $model = Paymentmethod::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+            'code' => fake()->unique()->lexify('???'),
+        ];
+    }
+}

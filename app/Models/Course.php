@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use App\Events\CourseCreated;
 use App\Events\CourseUpdated;
 use App\Traits\PriceTrait;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,13 +19,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Course extends Model
 {
-    use CrudTrait;
-    use LogsActivity;
+    use HasFactory, LogsActivity;
     use PriceTrait;
 
     protected $dispatchesEvents = [
         'updated' => CourseUpdated::class,
-        'created' => CourseCreated::class,
     ];
 
     protected $casts = [
@@ -243,10 +240,10 @@ class Course extends Model
         foreach ($newCourseTimes as $courseTime) {
             // create missing course times
             if ($this->times()
-                    ->where('day', $courseTime['day'])
-                    ->where('start', Carbon::parse($courseTime['start'])->toTimeString())
-                    ->where('end', Carbon::parse($courseTime['end'])->toTimeString())
-                    ->count() == 0) {
+                ->where('day', $courseTime['day'])
+                ->where('start', Carbon::parse($courseTime['start'])->toTimeString())
+                ->where('end', Carbon::parse($courseTime['end'])->toTimeString())
+                ->count() == 0) {
                 $this->times()->create([
                     'day' => $courseTime['day'],
                     'start' => Carbon::parse($courseTime['start'])->toTimeString(),

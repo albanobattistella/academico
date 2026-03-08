@@ -1,14 +1,23 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Fee;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Fee::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-        'price' => $faker->randomFloat(),
-        'product_code' => $faker->word(),
-    ];
-});
+/**
+ * @extends Factory<Fee>
+ */
+class FeeFactory extends Factory
+{
+    protected $model = Fee::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+            'price' => fake()->randomFloat(2, 5, 200),
+            'product_code' => fake()->word(),
+        ];
+    }
+}

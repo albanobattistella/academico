@@ -1,17 +1,27 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Invoice;
+use App\Models\InvoiceDetail;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\InvoiceDetail::class, function (Faker $faker) {
-    return [
-        'invoice_id' => factory(App\Models\Invoice::class),
-        'product_name' => $faker->word(),
-        'product_code' => $faker->word(),
-        'product_id' => $faker->randomNumber(),
-        'product_type' => $faker->word(),
-        'price' => $faker->randomFloat(),
-    ];
-});
+/**
+ * @extends Factory<InvoiceDetail>
+ */
+class InvoiceDetailFactory extends Factory
+{
+    protected $model = InvoiceDetail::class;
+
+    public function definition(): array
+    {
+        return [
+            'invoice_id' => Invoice::factory(),
+            'product_name' => fake()->word(),
+            'product_code' => fake()->word(),
+            'product_id' => fake()->randomNumber(),
+            'product_type' => fake()->word(),
+            'price' => fake()->randomFloat(2, 10, 500),
+        ];
+    }
+}

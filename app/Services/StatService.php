@@ -7,19 +7,9 @@ use App\Models\Enrollment;
 use App\Models\Partner;
 use App\Models\Period;
 use App\Models\Year;
-use DateTime;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
-
-class DateRange
-{
-    public function __construct(
-        public DateTime $start,
-        public DateTime $end,
-    ) {
-    }
-}
 
 class StatService
 {
@@ -94,6 +84,15 @@ class StatService
         return $total;
     }
 
+    public function newStudentsCount(): int
+    {
+        if ($this->reference::class !== Period::class) {
+            return 0;
+        }
+
+        return $this->reference->newStudents()->count();
+    }
+
     public function pendingEnrollmentsCount(): int
     {
         return match ($this->reference::class) {
@@ -145,7 +144,7 @@ class StatService
         }
 
         return DB::table('enrollments')->join('courses', 'enrollments.course_id', 'courses.id')->join('periods', 'courses.period_id', 'periods.id')->where('periods.year_id', $this->reference->id)->whereIn('enrollments.status_id', Enrollment::ENROLLMENT_STATUSES_TO_COUNT_IN_STATS)
-        ->where('enrollments.parent_id', null)->where('enrollments.deleted_at', null)->distinct('student_id')->count('enrollments.student_id');
+            ->where('enrollments.parent_id', null)->where('enrollments.deleted_at', null)->distinct('student_id')->count('enrollments.student_id');
     }
 
     private function countInternalStudentsForPeriod(?int $gender = null)
@@ -227,10 +226,10 @@ class StatService
     private function getPaidEnrollmentsCountForPeriod(Period $period): int
     {
         return $period
-                ->enrollments
-                ->where('status_id', 2) // paid
-                ->where('parent_id', null)
-                ->count();
+            ->enrollments
+            ->where('status_id', 2) // paid
+            ->where('parent_id', null)
+            ->count();
     }
 
     private function getPaidEnrollmentsCountForYear(Year $year)

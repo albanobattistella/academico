@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -26,14 +27,14 @@ return new class extends Migration {
             $table->boolean('exempt_attendance')->nullable();
             $table->integer('period_id')->unsigned();
             $table->integer('spots')->nullable();
-            //$table->softDeletes();
+            // $table->softDeletes();
             $table->timestamps();
         });
 
         Schema::table('courses', function (Blueprint $table) {
             $table->foreign('parent_course_id')
-            ->references('id')->on('courses')
-            ->onDelete('cascade');
+                ->references('id')->on('courses')
+                ->onDelete('cascade');
         });
     }
 

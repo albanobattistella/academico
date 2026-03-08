@@ -41,15 +41,20 @@ class InvoiceService
             ->series($invoice->invoice_series)
             ->sequence($invoice->invoice_number ?? $invoice->id)
             ->dateFormat('d/m/Y')
-            ->date($invoice->date)
-            ->logo(storage_path('logo2.png'))
+            ->date($invoice->date);
+
+        $generatedInvoice
             ->currencySymbol(config('academico.currency_symbol'))
             ->currencyCode(config('academico.currency_code'))
             ->currencyFormat($currencyFormat)
             ->notes($notes ?? '');
 
+        if (file_exists(storage_path('logo2.png'))) {
+            $generatedInvoice->logo(storage_path('logo2.png'));
+        }
+
         foreach ($invoice->invoiceDetails as $product) {
-            $item = (new InvoiceItem())->title($product->product_name)->pricePerUnit($product->price)->quantity($product->quantity);
+            $item = (new InvoiceItem)->title($product->product_name)->pricePerUnit($product->price)->quantity($product->quantity);
 
             $description = null;
 

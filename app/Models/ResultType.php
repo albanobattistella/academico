@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use App\Models\Concerns\HasFallbackTranslations;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class ResultType extends Model
 {
-    use CrudTrait;
-    use HasTranslations;
+    use HasFactory, HasFallbackTranslations;
 
     protected $guarded = ['id'];
 
@@ -19,11 +18,11 @@ class ResultType extends Model
 
     public function getTranslatedNameAttribute()
     {
-        return $this->getTranslation('name', app()->getLocale());
+        return $this->name;
     }
 
     public function getTranslatedDescriptionAttribute()
     {
-        return $this->getTranslation('description', app()->getLocale());
+        return $this->description;
     }
 }

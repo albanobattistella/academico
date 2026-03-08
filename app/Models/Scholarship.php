@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,9 +11,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Scholarship extends Model
 {
-    use CrudTrait;
+    use HasFactory, LogsActivity;
     use SoftDeletes;
-    use LogsActivity;
 
     protected $table = 'scholarships';
 

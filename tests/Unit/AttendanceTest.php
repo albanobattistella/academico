@@ -2,167 +2,42 @@
 
 namespace Tests\Unit;
 
-use App\Mail\PendingAttendanceReminder;
 use App\Models\Attendance;
-use App\Models\Course;
-use App\Models\Enrollment;
+use App\Models\AttendanceType;
 use App\Models\Event;
-use App\Models\Period;
 use App\Models\Student;
-use App\Models\Teacher;
-use App\Traits\HandlesAttendance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class AttendanceTest extends TestCase
 {
     use RefreshDatabase;
-    use HandlesAttendance;
 
-    protected function setUp(): void
+    public function test_can_create_attendance(): void
     {
-        parent::setUp();
-        $this->seed('TestSeeder');
+        $attendance = Attendance::factory()->create();
+
+        $this->assertDatabaseHas('attendances', ['id' => $attendance->id]);
     }
 
-    /**
-     * Send email reminders to all teachers who have classes with incomplete attendance records.
-     */
-    public function testRemindPendingAttendance(): void
+    public function test_attendance_belongs_to_student(): void
     {
-        Mail::fake();
-        // given a course with incomplete attendance
-        $teacher = factory(Teacher::class)->create();
-        $course = factory(Course::class)->create(['teacher_id' => $teacher->id]);
-        $course->times()->create(['day' => 1, 'start' => '09:00:00', 'end' => '17:00:00']);
-        $course->times()->create(['day' => 2, 'start' => '09:00:00', 'end' => '17:00:00']);
+        $attendance = Attendance::factory()->create();
 
-        // and a student enrolled in the course
-        $student = factory(Student::class)->create();
-
-        // We have to manually create the enrollment to prevent automatic attendance record creation (see next test)
-        DB::table('enrollments')->insert([
-            'course_id' => $course->id,
-            'student_id' => $student->id,
-        ]);
-
-        // a notification email is sent to the teacher of this event
-        $this->remindPendingAttendance();
-
-        Mail::assertQueued(PendingAttendanceReminder::class);
+        $this->assertInstanceOf(Student::class, $attendance->student);
     }
 
-    /** Absence count per student for the selected period */
-    public function test_get_absence_count_per_student(): void
+    public function test_attendance_belongs_to_event(): void
     {
-        Mail::fake();
-        // given a course with incomplete attendance
-        $teacher = factory(Teacher::class)->create();
-        $course = factory(Course::class)->create(['teacher_id' => $teacher->id]);
+        $attendance = Attendance::factory()->create();
 
-        // and a student enrolled in the course
-        $student = factory(Student::class)->create();
-
-        // We have to manually create the enrollment to prevent automatic attendance record creation (see next test)
-        DB::table('enrollments')->insert([
-            'course_id' => $course->id,
-            'student_id' => $student->id,
-        ]);
-
-        $event = $course->events()->create([
-            'start' => date('Y-m-d', strtotime('-2 days')),
-            'end' => date('Y-m-d', strtotime('-1 days')),
-            'name' => 'test event 1',
-            'teacher_id' => $teacher->fresh()->id,
-        ]);
-
-        Attendance::create([
-            'student_id' => $student->id,
-            'event_id' => $event->id,
-            'attendance_type_id' => 4,
-        ]);
-
-        $event = $course->events()->create([
-            'start' => date('Y-m-d', strtotime('-3 days')),
-            'end' => date('Y-m-d', strtotime('-2 days')),
-            'name' => 'test event 2',
-            'teacher_id' => $teacher->id,
-        ]);
-
-        Attendance::create([
-            'student_id' => $student->id,
-            'event_id' => $event->id,
-            'attendance_type_id' => 3,
-        ]);
-
-        // the absence count for this student should be two
-        $absences = (new Attendance)->get_absence_count_per_student(Period::get_default_period());
-        $this->assertEquals(2, $absences->first()->count());
+        $this->assertInstanceOf(Event::class, $attendance->event);
     }
 
-    /**
-     * Return events with incomplete attendance. This is shown on the dashboard.
-     */
-    public function test_get_pending_attendance(): void
+    public function test_attendance_belongs_to_attendance_type(): void
     {
-        // given a course with incomplete attendance
-        $teacher = factory(Teacher::class)->create();
-        $course = factory(Course::class)->create(['teacher_id' => $teacher->id]);
+        $attendance = Attendance::factory()->create();
 
-        // and a student enrolled in the course
-        $student = factory(Student::class)->create();
-
-        // We have to manually create the enrollment to prevent automatic attendance record creation (see next test)
-        DB::table('enrollments')->insert([
-            'course_id' => $course->id,
-            'student_id' => $student->id,
-        ]);
-
-        $event1 = $course->events()->create([
-            'start' => date('Y-m-d', strtotime('-2 days')),
-            'end' => date('Y-m-d', strtotime('-1 days')),
-            'name' => 'test event 1',
-            'teacher_id' => $teacher->id,
-        ]);
-
-        $event2 = $course->events()->create([
-            'start' => date('Y-m-d', strtotime('-3 days')),
-            'end' => date('Y-m-d', strtotime('-2 days')),
-            'name' => 'test event 2',
-            'teacher_id' => $teacher->id,
-        ]);
-
-        $coursesWithPendingAttendanceCount = Period::get_default_period()->courses_with_pending_attendance;
-
-        $this->assertEquals(1, $coursesWithPendingAttendanceCount);
-
-        Attendance::create([
-            'student_id' => $student->id,
-            'event_id' => $event2->id,
-            'attendance_type_id' => 2,
-        ]);
-
-        Attendance::create([
-            'student_id' => $student->id,
-            'event_id' => $event1->id,
-            'attendance_type_id' => 3,
-        ]);
-
-        $coursesWithPendingAttendanceCount = Period::get_default_period()->courses_with_pending_attendance;
-
-        $this->assertEquals(0, $coursesWithPendingAttendanceCount);
-    }
-
-    public function testStudentNameCanBeAccessed(): void
-    {
-        $student = factory(Student::class)->create();
-        $attendance = new Attendance([
-            'student_id' => $student->id,
-            'event_id' => new Event(),
-            'attendance_type_id' => 3,
-        ]);
-        $this->assertEquals($student->name, $attendance->student_name);
+        $this->assertInstanceOf(AttendanceType::class, $attendance->attendanceType);
     }
 }

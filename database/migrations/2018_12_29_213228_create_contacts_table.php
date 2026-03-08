@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -20,13 +21,13 @@ return new class extends Migration {
             $table->string('email')->nullable(); // if null; look in the users table
             $table->integer('relationship_id')->nullable()->unsigned();
             $table->timestamps();
-            //$table->softDeletes();
+            // $table->softDeletes();
         });
 
         Schema::table('contacts', function (Blueprint $table) {
             $table->foreign('student_id')
-            ->references('id')->on('students')
-            ->onDelete('cascade');
+                ->references('id')->on('students')
+                ->onDelete('cascade');
         });
     }
 

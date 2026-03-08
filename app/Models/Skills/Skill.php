@@ -4,7 +4,7 @@ namespace App\Models\Skills;
 
 use App\Models\EvaluationType;
 use App\Models\Level;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,8 +14,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Skill extends Model
 {
-    use CrudTrait;
-    use LogsActivity;
+    use HasFactory, LogsActivity;
 
     protected $guarded = ['id'];
 
@@ -54,5 +53,10 @@ class Skill extends Model
     public function getCompleteNameAttribute(): string
     {
         return '['.($this->level->name ?? '').'] '.($this->skillType->shortname ?? '').' - '.$this->name ?? '';
+    }
+
+    protected static function newFactory(): \Database\Factories\SkillFactory
+    {
+        return \Database\Factories\SkillFactory::new();
     }
 }

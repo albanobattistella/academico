@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
@@ -10,8 +10,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class PhoneNumber extends Model
 {
-    use LogsActivity;
-    use CrudTrait;
+    use HasFactory, LogsActivity;
 
     public $timestamps = false;
 

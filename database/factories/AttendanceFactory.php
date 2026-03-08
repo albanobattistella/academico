@@ -1,14 +1,26 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Attendance;
+use App\Models\AttendanceType;
+use App\Models\Event;
+use App\Models\Student;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Attendance::class, function (Faker $faker) {
-    return [
-        'student_id' => factory(App\Models\Student::class),
-        'event_id' => factory(App\Models\Event::class),
-        'attendance_type_id' => factory(App\Models\AttendanceType::class),
-    ];
-});
+/**
+ * @extends Factory<Attendance>
+ */
+class AttendanceFactory extends Factory
+{
+    protected $model = Attendance::class;
+
+    public function definition(): array
+    {
+        return [
+            'student_id' => Student::factory(),
+            'event_id' => Event::factory(),
+            'attendance_type_id' => AttendanceType::factory(),
+        ];
+    }
+}

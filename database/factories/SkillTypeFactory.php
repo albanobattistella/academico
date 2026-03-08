@@ -1,14 +1,22 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Skills\SkillType;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Skills\SkillType::class, function (Faker $faker) {
-    return [
-        'shortname' => $faker->word(),
-        'name' => $faker->name(),
-        'deleted_at' => $faker->dateTime(),
-    ];
-});
+/**
+ * @extends Factory<SkillType>
+ */
+class SkillTypeFactory extends Factory
+{
+    protected $model = SkillType::class;
+
+    public function definition(): array
+    {
+        return [
+            'shortname' => fake()->lexify('??'),
+            'name' => fake()->word(),
+        ];
+    }
+}

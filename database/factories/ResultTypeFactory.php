@@ -1,13 +1,22 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\ResultType;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\ResultType::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-        'description' => $faker->text(),
-    ];
-});
+/**
+ * @extends Factory<ResultType>
+ */
+class ResultTypeFactory extends Factory
+{
+    protected $model = ResultType::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->word(),
+            'description' => fake()->sentence(),
+        ];
+    }
+}

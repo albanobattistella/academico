@@ -1,10 +1,21 @@
 <?php
 
-use App\Models\Year;
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(Year::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->year($max = 'now'),
-    ];
-});
+use App\Models\Year;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Year>
+ */
+class YearFactory extends Factory
+{
+    protected $model = Year::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->unique()->year(),
+        ];
+    }
+}

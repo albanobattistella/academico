@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use App\Traits\ValueTrait;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -15,8 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class ScheduledPayment extends Model
 {
-    use CrudTrait;
-    use LogsActivity;
+    use HasFactory, LogsActivity;
     use ValueTrait;
 
     protected $table = 'scheduled_payments';

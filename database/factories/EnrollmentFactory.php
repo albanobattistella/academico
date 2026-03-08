@@ -1,14 +1,25 @@
 <?php
 
+namespace Database\Factories;
+
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Enrollment::class, function (Faker $faker) {
-    return [
-        'student_id' => factory(Student::class)->create()->id,
-        'course_id' => factory(Course::class)->create()->id,
-        'status_id' => 1,
-    ];
-});
+/**
+ * @extends Factory<Enrollment>
+ */
+class EnrollmentFactory extends Factory
+{
+    protected $model = Enrollment::class;
+
+    public function definition(): array
+    {
+        return [
+            'student_id' => Student::factory(),
+            'course_id' => Course::factory(),
+            'status_id' => 1,
+        ];
+    }
+}

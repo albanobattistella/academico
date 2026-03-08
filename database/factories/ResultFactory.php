@@ -1,13 +1,24 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Enrollment;
+use App\Models\Result;
+use App\Models\ResultType;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Result::class, function (Faker $faker) {
-    return [
-        'enrollment_id' => factory(App\Models\Enrollment::class),
-        'result_type_id' => factory(App\Models\ResultType::class),
-    ];
-});
+/**
+ * @extends Factory<Result>
+ */
+class ResultFactory extends Factory
+{
+    protected $model = Result::class;
+
+    public function definition(): array
+    {
+        return [
+            'enrollment_id' => Enrollment::factory(),
+            'result_type_id' => ResultType::factory(),
+        ];
+    }
+}

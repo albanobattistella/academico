@@ -1,10 +1,21 @@
 <?php
 
-use App\Models\Rhythm;
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(Rhythm::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->word(),
-    ];
-});
+use App\Models\Rhythm;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Rhythm>
+ */
+class RhythmFactory extends Factory
+{
+    protected $model = Rhythm::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->unique()->word(),
+        ];
+    }
+}

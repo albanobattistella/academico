@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -26,12 +27,12 @@ return new class extends Migration {
 
         Schema::table('results', function (Blueprint $table) {
             $table->foreign('result_type_id')
-            ->references('id')->on('result_types')
-            ->onDelete('restrict');
+                ->references('id')->on('result_types')
+                ->onDelete('restrict');
 
             $table->foreign('enrollment_id')
-            ->references('id')->on('enrollments')
-            ->onDelete('cascade');
+                ->references('id')->on('enrollments')
+                ->onDelete('cascade');
         });
     }
 

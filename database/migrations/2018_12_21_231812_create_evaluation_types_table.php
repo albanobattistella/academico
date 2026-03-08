@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -16,19 +17,19 @@ return new class extends Migration {
         });
 
         Schema::create('course_evaluation_type', function (Blueprint $table) {
-            //$table->increments('id');
+            // $table->increments('id');
             $table->integer('course_id')->unsigned();
             $table->integer('evaluation_type_id')->unsigned();
         });
 
         Schema::table('course_evaluation_type', function (Blueprint $table) {
             $table->foreign('course_id')
-            ->references('id')->on('courses')
-            ->onDelete('cascade');
+                ->references('id')->on('courses')
+                ->onDelete('cascade');
 
             $table->foreign('evaluation_type_id')
-            ->references('id')->on('evaluation_types')
-            ->onDelete('cascade');
+                ->references('id')->on('evaluation_types')
+                ->onDelete('cascade');
         });
     }
 

@@ -1,12 +1,21 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Institution;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Institution::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name(),
-    ];
-});
+/**
+ * @extends Factory<Institution>
+ */
+class InstitutionFactory extends Factory
+{
+    protected $model = Institution::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->company(),
+        ];
+    }
+}

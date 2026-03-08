@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -17,17 +18,17 @@ return new class extends Migration {
             $table->bigInteger('value');
             $table->string('comment')->nullable();
             $table->timestamps();
-            //$table->softDeletes();
+            // $table->softDeletes();
         });
 
         Schema::table('payments', function (Blueprint $table) {
             $table->foreign('responsable_id')
-            ->references('id')->on('users')
-            ->onDelete('restrict');
+                ->references('id')->on('users')
+                ->onDelete('restrict');
 
             $table->foreign('pre_invoice_id')
-            ->references('id')->on('pre_invoices')
-            ->onDelete('restrict');
+                ->references('id')->on('pre_invoices')
+                ->onDelete('restrict');
         });
     }
 

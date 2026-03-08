@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasFallbackTranslations;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class ContactRelationship extends Model
 {
-    use HasTranslations;
+    use HasFactory, HasFallbackTranslations;
 
     public $timestamps = false;
 
@@ -17,6 +18,6 @@ class ContactRelationship extends Model
 
     public function getTranslatedNameAttribute()
     {
-        return $this->getTranslation('name', app()->getLocale());
+        return $this->name;
     }
 }

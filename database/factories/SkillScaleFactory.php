@@ -1,15 +1,23 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Skills\SkillScale;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Skills\SkillScale::class, function (Faker $faker) {
-    return [
-        'shortname' => $faker->text(),
-        'name' => $faker->name(),
-        'value' => $faker->randomFloat(),
-        'deleted_at' => $faker->dateTime(),
-    ];
-});
+/**
+ * @extends Factory<SkillScale>
+ */
+class SkillScaleFactory extends Factory
+{
+    protected $model = SkillScale::class;
+
+    public function definition(): array
+    {
+        return [
+            'shortname' => fake()->lexify('??'),
+            'name' => fake()->word(),
+            'value' => fake()->randomFloat(2, 0, 10),
+        ];
+    }
+}

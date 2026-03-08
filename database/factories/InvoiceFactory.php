@@ -1,18 +1,27 @@
 <?php
 
-/* @var $factory Factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use App\Models\Invoice;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Models\Invoice::class, function (Faker $faker) {
-    return [
-        'client_name' => $faker->word(),
-        'client_idnumber' => $faker->word(),
-        'client_address' => $faker->word(),
-        'client_email' => $faker->word(),
-        'client_phone' => $faker->word(),
-        'company_id' => $faker->randomNumber(),
-        'receipt_number' => $faker->word(),
-    ];
-});
+/**
+ * @extends Factory<Invoice>
+ */
+class InvoiceFactory extends Factory
+{
+    protected $model = Invoice::class;
+
+    public function definition(): array
+    {
+        return [
+            'client_name' => fake()->name(),
+            'client_idnumber' => fake()->numerify('########'),
+            'client_address' => fake()->address(),
+            'client_email' => fake()->safeEmail(),
+            'client_phone' => fake()->phoneNumber(),
+            'company_id' => fake()->randomNumber(),
+            'receipt_number' => fake()->unique()->numerify('INV-####'),
+        ];
+    }
+}

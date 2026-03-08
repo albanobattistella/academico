@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Events\TeacherUpdated;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,9 +17,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Teacher extends Model
 {
-    use CrudTrait;
+    use HasFactory, LogsActivity;
     use SoftDeletes;
-    use LogsActivity;
 
     public $timestamps = true;
 
@@ -156,21 +155,21 @@ class Teacher extends Model
         $eventsWithMissingAttendance = [];
 
         $eventsWithExpectedAttendance = $this->events()
-        ->where(function ($query) {
-            $query->where('exempt_attendance', '!=', true);
-            $query->where('exempt_attendance', '!=', 1);
-            $query->orWhereNull('exempt_attendance');
-        })
-        ->where('course_id', '!=', null)
-        ->whereHas('course', fn (Builder $query) => $query->where('period_id', $period->id)
             ->where(function ($query) {
                 $query->where('exempt_attendance', '!=', true);
                 $query->where('exempt_attendance', '!=', 1);
                 $query->orWhereNull('exempt_attendance');
-            }))
-        ->with('course')
-        ->where('start', '<', Carbon::now(config('settings.courses_timezone'))->addMinutes(20)->toDateTimeString())
-        ->get();
+            })
+            ->where('course_id', '!=', null)
+            ->whereHas('course', fn (Builder $query) => $query->where('period_id', $period->id)
+                ->where(function ($query) {
+                    $query->where('exempt_attendance', '!=', true);
+                    $query->where('exempt_attendance', '!=', 1);
+                    $query->orWhereNull('exempt_attendance');
+                }))
+            ->with('course')
+            ->where('start', '<', Carbon::now(config('settings.courses_timezone'))->addMinutes(20)->toDateTimeString())
+            ->get();
 
         foreach ($eventsWithExpectedAttendance as $event) {
             foreach ($event->enrollments as $enrollment) {
