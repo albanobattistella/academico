@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Event;
-use App\Models\Period;
 use App\Models\Teacher;
 use Carbon\Carbon;
 use Filament\Widgets\Widget;

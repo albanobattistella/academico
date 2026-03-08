@@ -40,8 +40,12 @@ class InvoiceResource extends Resource
 
     public static function canAccess(): bool
     {
-        return (auth()->user()?->hasRole('admin') ?? false)
-            && config('invoicing.accounting_enabled')
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return config('invoicing.accounting_enabled')
             && ! config('invoicing.price_categories_enabled');
     }
 

@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\Enrollments\Pages;
 
+use App\Filament\Pages\CheckoutPage;
 use App\Filament\Pages\GradeEdit;
 use App\Filament\Pages\SkillEvaluationPage;
 use App\Filament\Resources\Enrollments\EnrollmentResource;
 use App\Filament\Resources\Enrollments\RelationManagers\EnrollmentCommentsRelationManager;
 use App\Filament\Resources\Enrollments\RelationManagers\ScholarshipsRelationManager;
+use App\Filament\Resources\Invoices\InvoiceResource;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -19,6 +22,7 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\HtmlString;
 
 class ViewEnrollment extends ViewRecord
 {
@@ -27,6 +31,13 @@ class ViewEnrollment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('checkout')
+                ->label(__('Checkout enrollment'))
+                ->icon('heroicon-o-shopping-cart')
+                ->color('success')
+                ->url(CheckoutPage::getUrl(['enrollment_id' => $this->record->id]))
+                ->visible(fn () => $this->record->status_id !== 2 && auth()->user()?->can('enrollments.edit')),
+
             Action::make('edit_price')
                 ->label(__('Price'))
                 ->icon('heroicon-o-currency-dollar')
@@ -78,6 +89,55 @@ class ViewEnrollment extends ViewRecord
                     $this->redirect(EnrollmentResource::getUrl('index'));
                 }),
         ];
+    }
+
+    protected function getInvoicesHtml(): string
+    {
+        $enrollment = $this->getRecord();
+        $invoices = $enrollment->relatedInvoices()->unique('id');
+
+        if ($invoices->isEmpty()) {
+            return '<p class="text-sm text-gray-500">'.__('No invoices').'</p>';
+        }
+
+        $currencySymbol = config('academico.currency_symbol', '€');
+        $currencyBefore = config('academico.currency_position') === 'before';
+        $formatCurrency = fn ($value) => $currencyBefore
+            ? $currencySymbol.' '.number_format((float) $value, 2)
+            : number_format((float) $value, 2).' '.$currencySymbol;
+
+        $rows = '';
+        foreach ($invoices as $invoice) {
+            $invoice->load(['invoiceDetails', 'payments', 'invoiceType']);
+            $ref = e($invoice->invoice_reference);
+            $date = $invoice->date?->format('d/m/Y') ?? '-';
+            $total = $formatCurrency($invoice->totalPrice());
+            $paid = $formatCurrency($invoice->paidTotal());
+            $balance = $invoice->balance;
+            $balanceFormatted = $formatCurrency($balance);
+            $balanceColor = $balance > 0 ? 'text-danger-600 dark:text-danger-400' : 'text-success-600 dark:text-success-400';
+
+            $refCell = '<a href="'.e(InvoiceResource::getUrl('view', ['record' => $invoice])).'" class="text-primary-600 hover:underline dark:text-primary-400">'.$ref.'</a>';
+
+            $rows .= '<tr class="border-b border-gray-200 dark:border-gray-700">'
+                .'<td class="px-3 py-2">'.$refCell.'</td>'
+                .'<td class="px-3 py-2">'.$date.'</td>'
+                .'<td class="px-3 py-2 text-right">'.$total.'</td>'
+                .'<td class="px-3 py-2 text-right">'.$paid.'</td>'
+                .'<td class="px-3 py-2 text-right '.$balanceColor.'">'.$balanceFormatted.'</td>'
+                .'</tr>';
+        }
+
+        return '<table class="w-full text-sm">'
+            .'<thead><tr class="border-b border-gray-300 dark:border-gray-600">'
+            .'<th class="px-3 py-2 text-left font-medium">'.__('Invoice #').'</th>'
+            .'<th class="px-3 py-2 text-left font-medium">'.__('Date').'</th>'
+            .'<th class="px-3 py-2 text-right font-medium">'.__('Total').'</th>'
+            .'<th class="px-3 py-2 text-right font-medium">'.__('Paid').'</th>'
+            .'<th class="px-3 py-2 text-right font-medium">'.__('Balance').'</th>'
+            .'</tr></thead>'
+            .'<tbody>'.$rows.'</tbody>'
+            .'</table>';
     }
 
     public function content(Schema $schema): Schema
@@ -139,6 +199,13 @@ class ViewEnrollment extends ViewRecord
                                     ]),
                                 Tabs::make()
                                     ->tabs([
+                                        Tab::make(__('Invoices'))
+                                            ->icon('heroicon-o-document-text')
+                                            ->schema([
+                                                Placeholder::make('invoices_list')
+                                                    ->label('')
+                                                    ->content(fn () => new HtmlString($this->getInvoicesHtml())),
+                                            ]),
                                         Tab::make(__('Books'))
                                             ->icon('heroicon-o-book-open')
                                             ->schema([

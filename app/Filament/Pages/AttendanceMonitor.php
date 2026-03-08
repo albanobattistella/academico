@@ -11,7 +11,6 @@ use BackedEnum;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 
-
 class AttendanceMonitor extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';

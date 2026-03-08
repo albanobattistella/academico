@@ -8,8 +8,11 @@ Academico is an open-source, Lavarel-based school management platform. Its main 
 # New 2026 version (Filament-based)
 The first versions of this project were built with the awesome Backpack for Laravel framework. However, the application was entirely rewritten with Laravel Filament. No changes in the database structure has been made, so the Filament version should work as a drop-in replacement of the Backpack version, with similar features. You can still access the Backpack version in the `pro` branch (but a Backpack license is required and the packages have not been updated in a long time). I strongly recommend switching to the Filament version.
 
+# Disclaimer
+The Filament version is still work in progress. Please use with caution, and report bugs if you encounter them. Contributions are welcome to make Academico a better, more usable software.
+
 # Contributors welcome! ✨
-If you are using this applications and want to make some improvements for your own needs, or just willing to contribute to an open-source project, please see [this page on the wiki](https://github.com/laxsmi/academico/wiki/Development-Roadmap) for details.
+If you are using this applications and want to make some improvements for your own needs, or just willing to contribute to an open-source project, feel free to open an issue and make some suggestions. Contributions might go from writing code, to extending the documentation or the translations, or simply suggesting new features, UX improvements, and so on.
 
 Thanks goes to these wonderful people for past or current version of this application ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
