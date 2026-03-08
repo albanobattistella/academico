@@ -70,30 +70,7 @@ class GradeEditPageTest extends TestCase
         $this->actingAs($admin);
     }
 
-    public function test_page_loads_with_default_period(): void
-    {
-        $component = Livewire::test(GradeEdit::class);
-
-        $component->assertSet('selectedPeriodId', $this->period->id);
-    }
-
-    public function test_courses_loaded_for_period(): void
-    {
-        // Create an enrollment so the course shows up (whereHas enrollments)
-        Enrollment::create([
-            'student_id' => Student::factory()->create()->id,
-            'course_id' => $this->course->id,
-            'status_id' => 1,
-        ]);
-
-        $component = Livewire::test(GradeEdit::class);
-
-        $courses = $component->get('courses');
-        $courseIds = collect($courses)->pluck('id')->toArray();
-        $this->assertContains($this->course->id, $courseIds);
-    }
-
-    public function test_selecting_course_loads_grade_data(): void
+    public function test_page_loads_with_course_id(): void
     {
         $student = Student::factory()->create();
         Enrollment::create([
@@ -102,14 +79,104 @@ class GradeEditPageTest extends TestCase
             'status_id' => 1,
         ]);
 
-        $component = Livewire::test(GradeEdit::class)
-            ->set('selectedCourseId', $this->course->id);
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])
+            ->test(GradeEdit::class);
+
+        $component->assertSet('courseId', $this->course->id);
+        $component->assertSet('courseName', $this->course->name);
+        $component->assertSet('selectedEnrollmentId', null);
+    }
+
+    public function test_page_aborts_without_course_id(): void
+    {
+        $this->get(GradeEdit::getUrl())->assertNotFound();
+    }
+
+    public function test_grade_data_loaded_on_mount(): void
+    {
+        $student = Student::factory()->create();
+        Enrollment::create([
+            'student_id' => $student->id,
+            'course_id' => $this->course->id,
+            'status_id' => 1,
+        ]);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])
+            ->test(GradeEdit::class);
 
         $gradeTypes = $component->get('gradeTypes');
         $enrollments = $component->get('enrollments');
 
         $this->assertNotEmpty($gradeTypes);
         $this->assertNotEmpty($enrollments);
+    }
+
+    public function test_select_student_sets_enrollment_id(): void
+    {
+        $student = Student::factory()->create();
+        $enrollment = Enrollment::create([
+            'student_id' => $student->id,
+            'course_id' => $this->course->id,
+            'status_id' => 1,
+        ]);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])
+            ->test(GradeEdit::class)
+            ->call('selectStudent', $enrollment->id);
+
+        $component->assertSet('selectedEnrollmentId', $enrollment->id);
+    }
+
+    public function test_back_to_overview_clears_selection(): void
+    {
+        $student = Student::factory()->create();
+        $enrollment = Enrollment::create([
+            'student_id' => $student->id,
+            'course_id' => $this->course->id,
+            'status_id' => 1,
+        ]);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])
+            ->test(GradeEdit::class)
+            ->call('selectStudent', $enrollment->id)
+            ->call('backToOverview');
+
+        $component->assertSet('selectedEnrollmentId', null);
+    }
+
+    public function test_next_and_previous_student_navigation(): void
+    {
+        $student1 = Student::factory()->create([
+            'id' => User::factory()->create(['firstname' => 'Alice', 'lastname' => 'Aardvark']),
+        ]);
+        $student2 = Student::factory()->create([
+            'id' => User::factory()->create(['firstname' => 'Bob', 'lastname' => 'Baker']),
+        ]);
+
+        $enrollment1 = Enrollment::create([
+            'student_id' => $student1->id,
+            'course_id' => $this->course->id,
+            'status_id' => 1,
+        ]);
+        $enrollment2 = Enrollment::create([
+            'student_id' => $student2->id,
+            'course_id' => $this->course->id,
+            'status_id' => 1,
+        ]);
+
+        $component = Livewire::withQueryParams(['courseId' => $this->course->id])
+            ->test(GradeEdit::class);
+
+        // Get the first enrollment from the sorted list
+        $enrollments = $component->get('enrollments');
+        $firstEnrollmentId = $enrollments[0]['enrollmentId'];
+        $secondEnrollmentId = $enrollments[1]['enrollmentId'];
+
+        $component->call('selectStudent', $firstEnrollmentId)
+            ->call('nextStudent')
+            ->assertSet('selectedEnrollmentId', $secondEnrollmentId)
+            ->call('previousStudent')
+            ->assertSet('selectedEnrollmentId', $firstEnrollmentId);
     }
 
     public function test_save_grade_persists_to_database(): void
@@ -121,8 +188,8 @@ class GradeEditPageTest extends TestCase
             'status_id' => 1,
         ]);
 
-        $component = Livewire::test(GradeEdit::class)
-            ->set('selectedCourseId', $this->course->id)
+        Livewire::withQueryParams(['courseId' => $this->course->id])
+            ->test(GradeEdit::class)
             ->call('saveGrade', $enrollment->id, $this->gradeType->id, '15.5');
 
         $this->assertDatabaseHas('grades', [
@@ -147,8 +214,8 @@ class GradeEditPageTest extends TestCase
             'grade' => 10,
         ]);
 
-        Livewire::test(GradeEdit::class)
-            ->set('selectedCourseId', $this->course->id)
+        Livewire::withQueryParams(['courseId' => $this->course->id])
+            ->test(GradeEdit::class)
             ->call('saveGrade', $enrollment->id, $this->gradeType->id, '');
 
         $this->assertDatabaseMissing('grades', [
@@ -172,8 +239,8 @@ class GradeEditPageTest extends TestCase
             'grade' => 10,
         ]);
 
-        Livewire::test(GradeEdit::class)
-            ->set('selectedCourseId', $this->course->id)
+        Livewire::withQueryParams(['courseId' => $this->course->id])
+            ->test(GradeEdit::class)
             ->call('saveGrade', $enrollment->id, $this->gradeType->id, '18');
 
         $this->assertEquals(1, Grade::where('enrollment_id', $enrollment->id)->where('grade_type_id', $this->gradeType->id)->count());

@@ -5,7 +5,6 @@ namespace App\Filament\Pages;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Grade;
-use App\Models\Period;
 use App\Models\Result;
 use App\Models\ResultType;
 use BackedEnum;
@@ -28,17 +27,18 @@ class GradeEdit extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return false;
     }
 
     protected string $view = 'filament.pages.grade-edit';
 
-    public ?int $selectedPeriodId = null;
+    public int $courseId;
 
-    public ?int $selectedCourseId = null;
+    public string $courseName = '';
 
-    /** @var array<int, array<string, mixed>> */
-    public array $courses = [];
+    public ?int $selectedEnrollmentId = null;
+
+    public bool $isReadOnly = false;
 
     /** @var array<int, array<string, mixed>> */
     public array $gradeTypes = [];
@@ -55,65 +55,23 @@ class GradeEdit extends Page
     public function mount(): void
     {
         $courseId = request()->integer('courseId') ?: null;
+        $course = $courseId ? Course::find($courseId) : null;
 
-        if ($courseId) {
-            $course = Course::find($courseId);
-            if ($course && Gate::allows('edit-course-grades', $course)) {
-                $this->selectedPeriodId = $course->period_id;
-                $this->loadCourses();
-                $this->selectedCourseId = $course->id;
-                $this->loadGradeData();
+        abort_unless($course, 404);
 
-                return;
-            }
-        }
+        $this->courseId = $course->id;
+        $this->courseName = $course->name;
 
-        $period = Period::get_default_period();
-        $this->selectedPeriodId = $period?->id;
-        $this->loadCourses();
-    }
+        $this->isReadOnly = Gate::denies('edit-course-grades', $course);
 
-    public function updatedSelectedPeriodId(): void
-    {
-        $this->selectedCourseId = null;
-        $this->gradeTypes = [];
-        $this->enrollments = [];
-        $this->loadCourses();
-    }
-
-    public function updatedSelectedCourseId(): void
-    {
         $this->loadGradeData();
-    }
-
-    protected function loadCourses(): void
-    {
-        if (! $this->selectedPeriodId) {
-            return;
-        }
-
-        $this->courses = Course::where('period_id', $this->selectedPeriodId)
-            ->whereHas('enrollments')
-            ->get()
-            ->filter(fn ($course) => Gate::allows('edit-course-grades', $course))
-            ->sortBy('name')
-            ->map(fn ($course) => [
-                'id' => $course->id,
-                'name' => $course->name,
-            ])
-            ->values()
-            ->toArray();
     }
 
     protected function loadGradeData(): void
     {
-        if (! $this->selectedCourseId) {
-            return;
-        }
+        $course = Course::with('evaluationType.gradeTypes.category')->find($this->courseId);
 
-        $course = Course::with('evaluationType.gradeTypes.category')->find($this->selectedCourseId);
-
-        if (! $course || ! $course->evaluationType || Gate::denies('edit-course-grades', $course)) {
+        if (! $course || ! $course->evaluationType) {
             $this->gradeTypes = [];
             $this->enrollments = [];
 
@@ -133,13 +91,14 @@ class GradeEdit extends Page
             ->map(fn ($rt) => [
                 'id' => $rt->id,
                 'name' => $rt->name,
+                'color' => $rt->color,
             ])
             ->toArray();
 
         $gradeTypeIds = collect($this->gradeTypes)->pluck('id')->toArray();
 
         $enrollments = Enrollment::with(['student', 'grades', 'result.result_name', 'result.comments'])
-            ->where('course_id', $this->selectedCourseId)
+            ->where('course_id', $this->courseId)
             ->whereDoesntHave('childrenEnrollments')
             ->get();
 
@@ -173,9 +132,55 @@ class GradeEdit extends Page
             ->toArray();
     }
 
+    public function selectStudent(int $enrollmentId): void
+    {
+        $this->selectedEnrollmentId = $enrollmentId;
+    }
+
+    public function backToOverview(): void
+    {
+        $this->selectedEnrollmentId = null;
+        $this->loadGradeData();
+    }
+
+    public function nextStudent(): void
+    {
+        $index = $this->getCurrentStudentIndex();
+        if ($index !== null && $index < count($this->enrollments) - 1) {
+            $this->selectStudent($this->enrollments[$index + 1]['enrollmentId']);
+        }
+    }
+
+    public function previousStudent(): void
+    {
+        $index = $this->getCurrentStudentIndex();
+        if ($index !== null && $index > 0) {
+            $this->selectStudent($this->enrollments[$index - 1]['enrollmentId']);
+        }
+    }
+
+    public function getCurrentStudentIndex(): ?int
+    {
+        if (! $this->selectedEnrollmentId) {
+            return null;
+        }
+
+        foreach ($this->enrollments as $i => $enrollment) {
+            if ($enrollment['enrollmentId'] === $this->selectedEnrollmentId) {
+                return $i;
+            }
+        }
+
+        return null;
+    }
+
     public function saveGrade(int $enrollmentId, int $gradeTypeId, string $value): void
     {
-        $course = Course::find($this->selectedCourseId);
+        if ($this->isReadOnly) {
+            return;
+        }
+
+        $course = Course::find($this->courseId);
 
         if (! $course || Gate::denies('edit-course-grades', $course)) {
             abort(403);
@@ -219,7 +224,11 @@ class GradeEdit extends Page
 
     public function saveResult(int $enrollmentId, string $resultTypeId): void
     {
-        $course = Course::find($this->selectedCourseId);
+        if ($this->isReadOnly) {
+            return;
+        }
+
+        $course = Course::find($this->courseId);
 
         if (! $course || Gate::denies('edit-course-grades', $course)) {
             abort(403);
@@ -254,7 +263,11 @@ class GradeEdit extends Page
 
     public function saveComment(int $enrollmentId, string $body): void
     {
-        $course = Course::find($this->selectedCourseId);
+        if ($this->isReadOnly) {
+            return;
+        }
+
+        $course = Course::find($this->courseId);
 
         if (! $course || Gate::denies('edit-course-grades', $course)) {
             abort(403);

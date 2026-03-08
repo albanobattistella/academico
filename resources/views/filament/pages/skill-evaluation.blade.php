@@ -232,19 +232,15 @@
                                                         $isActive = ($allEvaluations[$key] ?? null) === $scale['id'];
                                                         $color = $scale['color'] ?? '#9ca3af';
                                                     @endphp
-                                                    <button
-                                                        @if(!$isReadOnly)
-                                                            wire:click="setEvaluationFromMatrix({{ $enrollment['id'] }}, {{ $skill['id'] }}, {{ $scale['id'] }})"
-                                                        @endif
-                                                        class="px-2 py-1 text-xs font-medium transition-colors border {{ $i === 0 ? 'rounded-l-md' : '' }} {{ $i === count($scales) - 1 ? 'rounded-r-md' : '' }} {{ $i > 0 ? '-ml-px' : '' }} {{ $isActive ? 'z-10' : '' }} {{ $isReadOnly ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                    <span
+                                                        class="px-2 py-1 text-xs font-medium border {{ $i === 0 ? 'rounded-l-md' : '' }} {{ $i === count($scales) - 1 ? 'rounded-r-md' : '' }} {{ $i > 0 ? '-ml-px' : '' }} {{ $isActive ? 'z-10' : '' }}"
                                                         style="{{ $isActive
                                                             ? 'background-color: ' . $color . '; color: white; border-color: ' . $color . ';'
                                                             : 'background-color: transparent; color: ' . $color . '; border-color: ' . $color . '40;'
                                                         }}"
-                                                        @if($isReadOnly) disabled @endif
                                                     >
                                                         {{ $scale['shortname'] ?? $scale['name'] }}
-                                                    </button>
+                                                    </span>
                                                 @endforeach
                                             </div>
                                         </td>
