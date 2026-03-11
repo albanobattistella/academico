@@ -8,25 +8,25 @@
         body {
             font-family: Arial, Helvetica, sans-serif
         }
-        
+
         .level {
             margin-left: 2em;
         }
     </style>
 </head>
 <body>
-<h1>Rapport des cours externes</h1>
-<h2>Période : {{ $period_start->locale('fr')->isoFormat('Do MMMM YYYY') }} - {{ $period_end->locale('fr')->isoFormat('Do MMM YYYY') }}</h2>
-<h2>Institution : {{ $data['partner_name'] }}</h2>
+<h1>@lang('External Courses Report')</h1>
+<h2>@lang('Period :') {{ $period_start->locale(app()->getLocale())->isoFormat('Do MMMM YYYY') }} - {{ $period_end->locale(app()->getLocale())->isoFormat('Do MMM YYYY') }}</h2>
+<h2>@lang('Institution :') {{ $data['partner_name'] }}</h2>
 
 @foreach ($data['courses'] as $course)
-    <h4>Cours : {{ $course['course_name'] }}</h4>
+    <h4>@lang('Course :') {{ $course['course_name'] }}</h4>
     <div class="level">
-        <p>Classes effectuées : {{ implode(' ; ', $course['events']) }}</p>
-        <p>Soit un total de {{ $course['hours_count'] }} {{Str::plural('heure', $course['hours_count'])}} au prix horaire de ${{ $course['hourly_price'] }} = <strong>${{ $course['value'] }}</strong></p>
+        <p>@lang('Classes completed :') {{ implode(' ; ', $course['events']) }}</p>
+        <p>@lang('A total of :count hours at an hourly rate of $:price = $:total', ['count' => $course['hours_count'], 'price' => $course['hourly_price'], 'total' => $course['value']])</p>
     </div>
 @endforeach
-<p style="color: red;">Total pour {{ $data['partner_name'] }} : <strong>${{ $data['partner_balance'] }}</strong></p>
+<p style="color: red;">@lang('Total for') {{ $data['partner_name'] }} : <strong>${{ $data['partner_balance'] }}</strong></p>
 
 </body>
 </html>

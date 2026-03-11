@@ -1,4 +1,4 @@
-<h2>Détail des heures - {{ $monthName }} {{ $year }}</h2>
+<h2>@lang('Hours detail') - {{ $monthName }} {{ $year }}</h2>
 
 @foreach ($teachers as $teacher)
     <h3>{{ $teacher->name }}</h3>

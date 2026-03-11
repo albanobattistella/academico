@@ -14,6 +14,6 @@ class ExternalCourseReport extends Mailable
 
     public function build()
     {
-        return $this->subject('Facturation '.$this->data['partner_name'])->view('emails.external_courses_report');
+        return $this->subject(__('Billing').' '.$this->data['partner_name'])->view('emails.external_courses_report');
     }
 }

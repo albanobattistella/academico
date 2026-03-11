@@ -83,7 +83,7 @@ class ViewEnrollment extends ViewRecord
                 ->color('danger')
                 ->icon('heroicon-o-x-circle')
                 ->requiresConfirmation()
-                ->modalDescription('This will cancel the enrollment and delete associated attendance records. This action cannot be undone.')
+                ->modalDescription(__('This will cancel the enrollment and delete associated attendance records. This action cannot be undone.'))
                 ->action(function () {
                     $this->record->cancel();
                     $this->redirect(EnrollmentResource::getUrl('index'));

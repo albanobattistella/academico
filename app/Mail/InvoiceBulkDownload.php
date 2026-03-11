@@ -31,7 +31,7 @@ class InvoiceBulkDownload extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Téléchargement de factures Academico',
+            subject: __('Invoice Bulk Download'),
         );
     }
 

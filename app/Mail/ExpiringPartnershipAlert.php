@@ -19,6 +19,6 @@ class ExpiringPartnershipAlert extends Mailable
 
     public function build()
     {
-        return $this->subject('Expiration prochaine d\'un convenio')->view('emails.expiring_partnership_alert');
+        return $this->subject(__('Expiring Partnership Alert'))->view('emails.expiring_partnership_alert');
     }
 }

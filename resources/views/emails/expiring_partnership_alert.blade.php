@@ -1,3 +1,7 @@
-Le convenio avec {{ $partner->name }} expire le {{ Carbon\Carbon::parse($partner->expired_on)->locale('fr')->isoFormat('Do MMM YYYY') }}.
+@lang('The partnership with :partner expires on :date.', ['partner' => $partner->name, 'date' => \Carbon\Carbon::parse($partner->expired_on)->locale(app()->getLocale())->isoFormat('Do MMM YYYY')])
 
-Ce convenio @if ($partner->auto_renewal) est @else n'est pas @endif renconduit tacitement.
+@if ($partner->auto_renewal)
+@lang('This partnership is automatically renewed.')
+@else
+@lang('This partnership is not automatically renewed.')
+@endif

@@ -24,7 +24,7 @@ trait HandlesAttendance
 
             if ($events->count() > 0) {
                 Mail::to($teacher->email)
-                    ->locale('fr')
+                    ->locale($teacher->user?->locale ?? config('app.locale'))
                     ->queue(new PendingAttendanceReminder($teacher, $events));
             }
         }
