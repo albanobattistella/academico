@@ -287,7 +287,7 @@ class StudentResource extends Resource
                     ->date()
                     ->sortable()
                     ->toggleable()
-                    ->visibleFrom('lg'),
+                    ->visibleFrom('md'),
                 TextColumn::make('phone.phone_number')
                     ->label(__('Phone'))
                     ->badge()

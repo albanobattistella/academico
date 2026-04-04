@@ -89,7 +89,7 @@ class EnrollmentResource extends Resource
                             ->label(__('Price'))
                             ->money(config('academico.currency_code', 'USD')),
                         TextEntry::make('childrenEnrollments.course.name')
-                            ->label(__('Children Enrollments'))
+                            ->label(__('Submodule Enrollments'))
                             ->placeholder('-'),
                         TextEntry::make('course.teacher.name')
                             ->label(__('Teacher'))

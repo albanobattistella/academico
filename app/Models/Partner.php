@@ -13,6 +13,11 @@ class Partner extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'started_on' => 'date',
+        'expired_on' => 'date',
+    ];
+
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);

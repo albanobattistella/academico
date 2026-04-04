@@ -171,11 +171,11 @@ class CourseResource extends Resource
                                     ->visibleOn('edit'),
                             ]),
 
-                        Tab::make(__('Sub-levels'))
+                        Tab::make(__('Submodules'))
                             ->schema([
                                 Repeater::make('children')
                                     ->relationship()
-                                    ->label(__('Children courses'))
+                                    ->label(__('Submodules'))
                                     ->schema([
                                         TextInput::make('name')
                                             ->label(__('Name'))
@@ -356,7 +356,7 @@ class CourseResource extends Resource
                 IconColumn::make('parent_course_id')
                     ->label('')
                     ->icon(fn ($state) => $state ? 'heroicon-o-arrow-uturn-left' : null)
-                    ->tooltip(__('Child course'))
+                    ->tooltip(__('Submodule'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('marked')
                     ->boolean()
@@ -385,7 +385,7 @@ class CourseResource extends Resource
                     ->label(__('Level'))
                     ->preload(),
                 TernaryFilter::make('hide_children')
-                    ->label(__('Hide Children Courses'))
+                    ->label(__('Hide Submodules'))
                     ->queries(
                         true: fn ($query) => $query->whereNull('parent_course_id'),
                         false: fn ($query) => $query->whereNotNull('parent_course_id'),
