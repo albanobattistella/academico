@@ -1,24 +1,30 @@
-# Use FrankenPHP with PHP 8.5
+# Stage 1: Build frontend assets
+FROM node:22-slim AS frontend
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
+COPY vite.config.js ./
+COPY resources ./resources
+COPY app ./app
+RUN npm run build
+
+# Stage 2: Install PHP dependencies
+FROM composer:latest AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --ignore-platform-reqs
+COPY . .
+RUN composer dump-autoload --no-dev --optimize
+
+# Stage 3: Final runtime image
 FROM dunglas/frankenphp:1-php8.5
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    libonig-dev \
     default-mysql-client \
-    nodejs \
-    npm \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
 RUN install-php-extensions \
     pdo_mysql \
     mbstring \
@@ -31,22 +37,12 @@ RUN install-php-extensions \
     intl \
     zip
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Copy application files
 COPY . .
+COPY --from=vendor /app/vendor ./vendor
+COPY --from=frontend /app/public/build ./public/build
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Install Node dependencies and build assets
-RUN npm install && npm run build
-
-# Set permissions
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-# Expose port 80 and 443 for HTTP and HTTPS
 EXPOSE 80 443
 
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
