@@ -41,6 +41,10 @@ COPY . .
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 
+RUN php artisan package:discover --ansi \
+    && php artisan view:clear \
+    && php artisan storage:link || true
+
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
 EXPOSE 80 443
